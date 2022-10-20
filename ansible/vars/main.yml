@@ -1,0 +1,54 @@
+---
+username: adi
+bastion_username: bastion_user
+local_temp_certs_dir: "{{ playbook_dir }}/certs"
+## Debating whether to do this or copy keys from root user
+# ssh_key_path: /home/adi/.ssh/id_ed25519.pub
+# ssh_copy_key: true
+
+## NOTE:
+## The following vars are provided by terraform as host vars:
+#
+#   all:
+#     - consul_node_name
+#   clients:
+#     - consul_acl_client_token
+#
+## The following vars are provided by terraform as group vars:
+#
+#   all:
+#     - ansible_ssh_common_args (for jumping through bastion)
+#     - consul_gossip_encrypt_key
+#   servers:
+#     - consul_acl_bootstrap_token
+
+# Consul
+consul_config_dir: /etc/consul.d  # default from deb package
+consul_data_dir: /opt/consul
+consul_certs_dir: "{{ consul_config_dir }}/certs"
+consul_datacenter: dc1
+consul_server_count: 1
+consul_client_count: 1
+# the first server in the inventory for operations on clients before the client is started
+consul_first_server:
+  hostname: "{{ groups['servers'][0] }}"
+  ip: "\
+    {% if hostvars[groups['servers'][0]]['ansible_host'] is defined %}\
+      {{ hostvars[groups['servers'][0]]['ansible_host'] }}\
+    {% else %}\
+      {{ groups['servers'][0] }}\
+    {% endif %}"
+
+# Nomad
+nomad_config_dir: /etc/nomad.d  # default from deb package
+nomad_data_dir: /opt/nomad
+nomad_datacenter: "{{ consul_datacenter }}"
+nomad_server_count: "{{ consul_server_count }}"
+nomad_cni_dir: /opt/cni/bin
+nomad_cni_version: v1.0.0
+nomad_cni_url: "https://github.com/containernetworking/plugins/releases/download/{{ nomad_cni_version }}/cni-plugins-linux-amd64-{{ nomad_cni_version }}.tgz"
+
+# Docker
+docker_install_compose_standalone: true
+docker_compose_standalone_version: v2.11.1
+docker_compose_standalone_url: "https://github.com/docker/compose/releases/download/{{ docker_compose_standalone_version }}/docker-compose-Linux-x86_64"

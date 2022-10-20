@@ -1,0 +1,15 @@
+---
+- name: Copy Nomad server agents config
+  ansible.builtin.copy:
+    dest: "{{ nomad_config_dir }}/server.hcl"
+    src: "{{ playbook_dir }}/../nomad/server.hcl"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+# TODO: use template for this service so we can use the nomad_config_dir var
+- name: Start Nomad and ensure it starts on boot
+  ansible.builtin.service:
+    name: nomad.service
+    enabled: yes
+    state: started

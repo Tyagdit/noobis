@@ -1,0 +1,70 @@
+---
+# Basic setup
+- name: Add new non-root user and add it to sudo group
+  ansible.builtin.user:
+    name: "{{ username }}"
+    state: present
+    groups: sudo
+    append: yes
+
+- name: Update and Upgrade apt cache and packages
+  ansible.builtin.apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+
+- name: Remove snap
+  ansible.builtin.apt:
+    name: snapd
+    state: absent
+    autoremove: yes
+    purge: yes
+
+## Debating whether to do this or copy keys from root user
+# - name: Copy ssh public key
+#   ansible.posix.authorized_key:
+#     user: "{{ username }}"
+#     key: "{{ lookup('file', ssh_key_path) }}"
+#     state: present
+#   when: ssh_copy_key | bool
+
+- name: Ensure user's SSH dir exists
+  ansible.builtin.file:
+    path: "/home/{{ username }}/.ssh"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0755
+
+- name: Copy SSH key from root user
+  ansible.builtin.copy:
+    dest: "/home/{{ username }}/.ssh/authorized_keys"
+    src: /root/.ssh/authorized_keys
+    remote_src: yes
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Secure SSH
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    validate: 'sshd -t -f %s'
+  loop:
+    - regexp: "^PasswordAuthentication"
+      line: "PasswordAuthentication no"
+    - regexp: "^PermitRootLogin"
+      line: "PermitRootLogin no"
+  notify: restart sshd
+
+# HashiCorp apt repo Setup
+- name: Add HashiCorp GPG apt key
+  ansible.builtin.apt_key:
+    url: https://apt.releases.hashicorp.com/gpg
+    state: present
+
+- name: Add HashiCorp Linux Repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main

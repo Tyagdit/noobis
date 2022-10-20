@@ -1,0 +1,26 @@
+---
+- name: Generate private key for CA cert
+  community.crypto.openssl_privatekey:
+    path: "{{ local_temp_certs_dir }}/consul_ca_key.pem"
+    return_content: yes
+  register: consul_ca_key
+
+- name: Generate in-memory cert sign request for CA (self-signed) cert
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ local_temp_certs_dir }}/consul_ca_key.pem"
+    basic_constraints_critical: yes
+    basic_constraints:
+      - CA:TRUE
+    key_usage_critical: yes
+    key_usage:
+      - digitalSignature
+      - certificateSign
+      - crlSign
+  register: consul_ca_csr
+
+- name: Generate CA cert from CSR
+  community.crypto.x509_certificate:
+    path: "{{ local_temp_certs_dir }}/consul_ca_cert.pem"
+    csr_content: "{{ consul_ca_csr.csr }}"
+    privatekey_path: "{{ local_temp_certs_dir }}/consul_ca_key.pem"
+    provider: selfsigned

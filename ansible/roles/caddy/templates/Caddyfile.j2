@@ -1,0 +1,22 @@
+:80 {
+    reverse_proxy {
+        lb_policy round_robin
+
+        transport http {
+            # use consul's client TLS cert and key since every consul agent is verifying incoming connections with TLS
+            tls_client_auth {{ consul_certs_dir }}/client_tls_cert.pem {{ consul_certs_dir }}/client_tls_key.pem
+            tls_trusted_ca_certs {{ consul_certs_dir }}/ca_cert.pem
+        }
+
+        dynamic multi {
+            srv {
+                service web
+                proto tcp
+                name service.consul
+                resolvers 127.0.0.1:8600
+            }
+        }
+    }
+}
+
+# vim: set backupcopy=yes:

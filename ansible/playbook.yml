@@ -1,0 +1,57 @@
+---
+# - name: Bootstrap bastion
+#   hosts: bastions
+#   remote_user: root
+#   vars_files:
+#     - vars/main.yml
+#   roles:
+#     - bastion
+
+- name: Bootstrap other instances
+  hosts: all
+  remote_user: root
+  vars_files:
+    - vars/main.yml
+  roles:
+    - base
+
+- name: Create TLS keys and certs
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/main.yml
+  roles:
+    - tls
+
+- name: Setup server agents
+  hosts: servers
+  remote_user: "{{ username }}"
+  vars_files:
+    - vars/main.yml
+  roles:
+    - nomad-install
+    - nomad-server
+    - consul-install
+    - consul-server
+
+- name: Setup client agents
+  hosts: clients
+  remote_user: "{{ username }}"
+  vars_files:
+    - vars/main.yml
+  roles:
+    - nomad-install
+    - nomad-client
+    - consul-install
+    - consul-client
+    - docker
+
+- name: Setup loadbalancers
+  hosts: loadbalancers
+  remote_user: "{{ username }}"
+  vars_files:
+    - vars/main.yml
+  roles:
+    - consul-install
+    - consul-client
+    - caddy

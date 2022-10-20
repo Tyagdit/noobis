@@ -1,0 +1,59 @@
+---
+- name: Create client TLS key and cert
+  include: tls.yml
+
+- name: Create ACL token
+  include: acl.yml
+
+# Setup consul DNS forwarding
+- name: Ensure main systemd-resolved config exists
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf
+    state: touch
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Ensure systemd-resolved config directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0755
+
+# - name: Disable local resolver stub from systemd-resolved
+#   ansible.builtin.lineinfile:
+#     path: /etc/systemd/resolved.conf
+#     regexp: "DNSStubListener"
+#     line: "DNSStubListener=false"
+#     state: present
+
+- name: Copy consul DNS forwarding config for systemd-resolved 
+  ansible.builtin.copy:
+    dest: /etc/systemd/resolved.conf.d/consul-dns.conf
+    content: |
+      [Resolve]
+      DNS=127.0.0.1:8600
+      DNSSEC=false
+      Domains=~consul
+
+- name: Restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted
+
+- name: Copy Consul client agents config
+  ansible.builtin.template:
+    dest: "{{ consul_config_dir }}/client.hcl"
+    src: client.hcl.j2
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+# TODO: use template for this service so we can use the consul_config_dir var
+- name: Start Consul and ensure it starts on boot
+  ansible.builtin.service:
+    name: consul.service
+    enabled: yes
+    state: started

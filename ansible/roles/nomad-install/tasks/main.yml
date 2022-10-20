@@ -1,0 +1,25 @@
+---
+- name: Install Nomad
+  ansible.builtin.apt:
+    name: nomad
+    state: present
+    update_cache: yes
+
+- name: Ensure Nomad config and data dir exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0755
+  loop:
+    - "{{ nomad_config_dir }}"
+    - "{{ nomad_data_dir }}"
+
+- name: Add Nomad configuration
+  ansible.builtin.copy:
+    dest: "{{ nomad_config_dir }}/nomad.hcl"
+    src: "{{ playbook_dir }}/../nomad/nomad.hcl"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
