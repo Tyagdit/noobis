@@ -1,8 +1,14 @@
 ---
+- name: Create server TLS key and cert
+  include: tls.yml
+
+- name: Create consul ACL token
+  include: consul-acl.yml
+
 - name: Copy Nomad server agents config
-  ansible.builtin.copy:
+  ansible.builtin.template:
     dest: "{{ nomad_config_dir }}/server.hcl"
-    src: "{{ playbook_dir }}/../nomad/server.hcl"
+    src: server.hcl.j2
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0644

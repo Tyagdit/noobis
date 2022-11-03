@@ -1,0 +1,41 @@
+{{- if "[[ caddy_host_domain ]]" -}}
+# Nomad UI
+[[ caddy_subdomain_nomad ]].[[ caddy_host_domain ]] {
+    reverse_proxy {{- range service "http.nomad" }} {{ .Address }}:{{ .Port }} {{- end }} {
+        transport http {
+            # use nomads's client TLS cert and key since every nomad agent is verifying incoming connections with TLS
+            tls_client_auth [[ nomad_certs_dir ]]/nomad_client_tls_cert.pem [[ nomad_certs_dir ]]/nomad_client_tls_key.pem
+            tls_trusted_ca_certs [[ nomad_certs_dir ]]/nomad_ca_cert.pem
+        }
+    }
+}
+
+# Consul UI
+[[ caddy_subdomain_consul ]].[[ caddy_host_domain ]] {
+    reverse_proxy {{- range service "consul" }} {{ .Address }}:8500 {{- end }} {
+        transport http {
+            # use consul's client TLS cert and key since every consul agent is verifying incoming connections with TLS
+            tls_client_auth [[ consul_certs_dir ]]/consul_client_tls_cert.pem [[ consul_certs_dir ]]/consul_client_tls_key.pem
+            tls_trusted_ca_certs [[ consul_certs_dir ]]/consul_ca_cert.pem
+        }
+    }
+}
+
+{{ end -}}
+
+{{- range services }}
+{{- if .Tags | join "" | regexMatch "userfacing-" }}
+
+  {{- if "[[ caddy_host_domain ]]" -}}
+    {{- $subdomain := .Tags | join ":" | regexReplaceAll ".*userfacing-(.*?):.*" "$1" -}}
+    {{- scratch.Set "host" (printf "%s.%s" $subdomain "[[ caddy_host_domain ]]") -}}
+  {{- else -}}
+    {{- scratch.Set "host" "localhost" -}}
+  {{- end -}}
+
+{{ scratch.Get "host" }} {
+    reverse_proxy {{- range service .Name }} {{ .Address }}:{{ .Port }} {{- end }}
+}
+
+{{- end -}}
+{{- end -}}

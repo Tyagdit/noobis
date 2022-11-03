@@ -5,8 +5,8 @@
   ansible.builtin.uri:
     url: "https://{{ consul_first_server_ip }}:8501/v1/status/leader"
     ca_path:  "{{ consul_certs_dir }}/consul_ca_cert.pem"
-    client_key: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
-    client_cert: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
+    client_key: "{{ consul_certs_dir }}/consul_server_tls_key.pem"
+    client_cert: "{{ consul_certs_dir }}/consul_server_tls_cert.pem"
     return_content: yes
   register: consul_leader
   until: (consul_leader.json is defined) and (consul_leader.json != '')
@@ -14,45 +14,46 @@
   delay: 6
   run_once: true
 
-- name: Create consul policy for DNS resolving
+- name: Create consul policy for nomad servers
   ansible.builtin.uri:
     method: PUT
     url: "https://{{ consul_first_server_ip }}:8501/v1/acl/policy"
     ca_path:  "{{ consul_certs_dir }}/consul_ca_cert.pem"
-    client_key: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
-    client_cert: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
+    client_key: "{{ consul_certs_dir }}/consul_server_tls_key.pem"
+    client_cert: "{{ consul_certs_dir }}/consul_server_tls_cert.pem"
     return_content: yes
     headers:
       X-Consul-Token: "{{ consul_acl_bootstrap_token }}"
     body_format: json
     body:
-      Name: dns-policy
-      Description: "Policy to allow DNS lookups from the node serving DNS requests"
+      Name: nomad-server-policy
+      Description: "Policy for nomad server agents"
       Rules: |
+        agent_prefix "" {
+          policy = "read"
+        }
         node_prefix "" {
           policy = "read"
         }
         service_prefix "" {
-          policy = "read"
+          policy = "write"
         }
-  register: consul_dns_policy
+        acl = "write"
+  register: consul_nomad_server_policy
   run_once: true
 
-- name: Create ACL token for consul_{{ node_id }}
+- name: Create ACL token for nomad_{{ node_id }}
   ansible.builtin.uri:
     method: PUT
     url: "https://{{ consul_first_server_ip }}:8501/v1/acl/token"
     ca_path:  "{{ consul_certs_dir }}/consul_ca_cert.pem"
-    client_key: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
-    client_cert: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
+    client_key: "{{ consul_certs_dir }}/consul_server_tls_key.pem"
+    client_cert: "{{ consul_certs_dir }}/consul_server_tls_cert.pem"
     headers:
       X-Consul-Token: "{{ consul_acl_bootstrap_token }}"
     body_format: json
     body:
-      SecretID: "{{ consul_acl_client_token }}"
-      Description: "ACL token for consul_{{ node_id }}"
+      SecretID: "{{ consul_acl_nomad_server_token }}"
+      Description: "ACL token for nomad_{{ node_id }}"
       Policies:
-        - ID: "{{ consul_dns_policy.json.ID }}"
-      NodeIdentities:
-        - NodeName: "consul_{{ node_id }}"
-          Datacenter: "{{ consul_datacenter }}"
+        - ID: "{{ consul_nomad_server_policy.json.ID }}"

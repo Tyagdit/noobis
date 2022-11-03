@@ -1,15 +1,15 @@
 ---
-- name: Generate private key for client TLS cert
+- name: Generate private key for consul client TLS cert
   community.crypto.openssl_privatekey:
-    path: "{{ consul_certs_dir }}/client_tls_key.pem"
+    path: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
 
-- name: Generate in-memory CSR for client TLS cert
+- name: Generate in-memory CSR for consul client TLS cert
   community.crypto.openssl_csr_pipe:
-    privatekey_path: "{{ consul_certs_dir }}/client_tls_key.pem"
+    privatekey_path: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
     common_name: "client.{{ consul_datacenter }}.consul"
     subject_alt_name:
       - "DNS:client.{{ consul_datacenter }}.consul"
-      - "DNS:{{ consul_node_name }}.client.{{ consul_datacenter }}.consul"
+      - "DNS:consul_{{ node_id }}.client.{{ consul_datacenter }}.consul"
       - "DNS:localhost"
       - "IP:127.0.0.1"
     basic_constraints_critical: yes
@@ -23,12 +23,12 @@
     # extended_key_usage:
     #   - TLS Web Server Authentication
     #   - TLS Web Client Authentication
-  register: client_csr
+  register: consul_client_csr
 
-- name: Generate client TLS cert from CSR with in-memory CA key
+- name: Generate consul client TLS cert from CSR with in-memory CA key
   community.crypto.x509_certificate:
-    path: "{{ consul_certs_dir }}/client_tls_cert.pem"
-    csr_content: "{{ client_csr.csr }}"
+    path: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
+    csr_content: "{{ consul_client_csr.csr }}"
     ownca_privatekey_content: "{{ consul_ca_key.privatekey }}"
-    ownca_path: "{{ consul_certs_dir }}/ca_cert.pem"
+    ownca_path: "{{ consul_certs_dir }}/consul_ca_cert.pem"
     provider: ownca

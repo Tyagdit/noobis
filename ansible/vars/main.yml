@@ -1,54 +1,79 @@
 ---
-username: adi
-bastion_username: bastion_user
+username: "adi"
 local_temp_certs_dir: "{{ playbook_dir }}/certs"
+local_secrets_dir: "{{ playbook_dir }}/secrets"
+# bastion_username: "bastion_user"
 ## Debating whether to do this or copy keys from root user
 # ssh_key_path: /home/adi/.ssh/id_ed25519.pub
 # ssh_copy_key: true
 
 ## NOTE:
-## The following vars are provided by terraform as host vars:
+## *host* vars provided by terraform:
 #
 #   all:
-#     - consul_node_name
+#     - node_id
+#   servers:
+#     - consul_acl_nomad_server_token
 #   clients:
 #     - consul_acl_client_token
+#     - consul_acl_nomad_client_token
+#   loadbalancers:
+#     - consul_acl_client_token
 #
-## The following vars are provided by terraform as group vars:
+## *group* vars provided by terraform:
 #
 #   all:
 #     - ansible_ssh_common_args (for jumping through bastion)
 #     - consul_gossip_encrypt_key
-#   servers:
 #     - consul_acl_bootstrap_token
+#     - nomad_gossip_encrypt_key
+
+# Terraform
+terraform_project_dir: "{{ playbook_dir }}/../terraform"
+terraform_var_bastion_username: "bastion_user"
+terraform_var_ssh_key_name: ""
+terraform_var_network_ip_range: "10.0.0.0/24" 
+terraform_var_subnet_ip_range: "10.0.0.0/28" 
+terraform_var_loadbalancer_count: 1
+terraform_var_server_node_count: 1
+terraform_var_client_node_count: 1
 
 # Consul
 consul_config_dir: /etc/consul.d  # default from deb package
 consul_data_dir: /opt/consul
 consul_certs_dir: "{{ consul_config_dir }}/certs"
-consul_datacenter: dc1
-consul_server_count: 1
-consul_client_count: 1
+consul_datacenter: "dc1"
+consul_server_count: "{{ terraform_var_server_node_count }}"
+consul_client_count: "{{ terraform_var_client_node_count }}"
 # the first server in the inventory for operations on clients before the client is started
-consul_first_server:
-  hostname: "{{ groups['servers'][0] }}"
-  ip: "\
-    {% if hostvars[groups['servers'][0]]['ansible_host'] is defined %}\
-      {{ hostvars[groups['servers'][0]]['ansible_host'] }}\
-    {% else %}\
-      {{ groups['servers'][0] }}\
-    {% endif %}"
+consul_first_server_ip: "{{ hostvars[groups['servers'][0]]['ansible_host'] | default(groups['servers'][0]) }}"
 
 # Nomad
 nomad_config_dir: /etc/nomad.d  # default from deb package
 nomad_data_dir: /opt/nomad
+nomad_certs_dir: "{{ nomad_config_dir }}/certs"
 nomad_datacenter: "{{ consul_datacenter }}"
-nomad_server_count: "{{ consul_server_count }}"
+nomad_region: "global"
+nomad_server_count: "{{ terraform_var_server_node_count }}"
+nomad_client_count: "{{ terraform_var_client_node_count }}"
+# nomad_first_server_ip: "{{ consul_first_server_ip }}"
 nomad_cni_dir: /opt/cni/bin
-nomad_cni_version: v1.0.0
+nomad_cni_version: "v1.0.0"
 nomad_cni_url: "https://github.com/containernetworking/plugins/releases/download/{{ nomad_cni_version }}/cni-plugins-linux-amd64-{{ nomad_cni_version }}.tgz"
 
 # Docker
 docker_install_compose_standalone: true
-docker_compose_standalone_version: v2.11.1
+docker_compose_standalone_version: "v2.11.1"
 docker_compose_standalone_url: "https://github.com/docker/compose/releases/download/{{ docker_compose_standalone_version }}/docker-compose-Linux-x86_64"
+
+# Caddy
+caddy_docker_tag: "2.6.2-alpine"
+caddy_host_domain: ""
+caddy_subdomain_nomad: "nomad"
+caddy_subdomain_consul: "consul"
+
+# consul-template
+consul_template_config_dir: /etc/consul-template.d
+consul_template_templates_dir: "{{ consul_template_config_dir }}/templates"
+consul_template_version: "0.29.5"
+consul_template_url: "https://releases.hashicorp.com/consul-template/{{ consul_template_version }}/consul-template_{{ consul_template_version }}_linux_amd64.zip"

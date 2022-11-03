@@ -25,9 +25,9 @@
     group: "{{ username }}"
     mode: 0644
 
-- name: Copy CA cert over
+- name: Copy consul CA cert over
   ansible.builtin.copy:
-    dest: "{{ consul_certs_dir }}/ca_cert.pem"
+    dest: "{{ consul_certs_dir }}/consul_ca_cert.pem"
     src: "{{ local_temp_certs_dir }}/consul_ca_cert.pem"
     owner: "{{ username }}"
     group: "{{ username }}"

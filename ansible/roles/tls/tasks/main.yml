@@ -1,2 +1,4 @@
 ---
 - include: consul.yml
+
+- include: nomad.yml

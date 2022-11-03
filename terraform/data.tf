@@ -1,3 +1,3 @@
 data "hcloud_ssh_key" "default_ssh_key" {
-  name = "adi@Abyss"
+  name = var.ssh_key_name
 }

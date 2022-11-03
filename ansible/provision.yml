@@ -1,13 +1,16 @@
 ---
-# - name: Bootstrap bastion
-#   hosts: bastions
-#   remote_user: root
-#   vars_files:
-#     - vars/main.yml
-#   roles:
-#     - bastion
+- name: Pre-provision checks
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Ensure host domain name for caddy is provided
+      ansible.builtin.assert:
+        that: caddy_host_domain != ""
+        fail_msg: "No host domain name provided, please configure the 'caddy_host_domain' variable"
 
-- name: Bootstrap other instances
+- name: Bootstrap all VMs
   hosts: all
   remote_user: root
   vars_files:
@@ -29,10 +32,10 @@
   vars_files:
     - vars/main.yml
   roles:
-    - nomad-install
-    - nomad-server
     - consul-install
     - consul-server
+    - nomad-install
+    - nomad-server
 
 - name: Setup client agents
   hosts: clients
@@ -40,11 +43,11 @@
   vars_files:
     - vars/main.yml
   roles:
-    - nomad-install
-    - nomad-client
     - consul-install
     - consul-client
     - docker
+    - nomad-install
+    - nomad-client
 
 - name: Setup loadbalancers
   hosts: loadbalancers

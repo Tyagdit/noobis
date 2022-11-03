@@ -21,7 +21,7 @@ resource "hcloud_server" "bastion" {
 }
 
 # using this instead of the network block in hcloud_server
-# because that is annoying to iterate over or get private IP from
+# because it's annoying to iterate over that and get private IP from it
 resource "hcloud_server_network" "bastion_network" {
   server_id = hcloud_server.bastion.id
   subnet_id = hcloud_network_subnet.private_subnet.id

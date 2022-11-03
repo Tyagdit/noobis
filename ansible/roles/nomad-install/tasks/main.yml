@@ -5,7 +5,7 @@
     state: present
     update_cache: yes
 
-- name: Ensure Nomad config and data dir exist
+- name: Ensure Nomad config, data and certs dir exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -15,11 +15,20 @@
   loop:
     - "{{ nomad_config_dir }}"
     - "{{ nomad_data_dir }}"
+    - "{{ nomad_certs_dir }}"
 
 - name: Add Nomad configuration
-  ansible.builtin.copy:
+  ansible.builtin.template:
     dest: "{{ nomad_config_dir }}/nomad.hcl"
-    src: "{{ playbook_dir }}/../nomad/nomad.hcl"
+    src: nomad.hcl.j2
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Copy nomad CA cert over
+  ansible.builtin.copy:
+    dest: "{{ nomad_certs_dir }}/nomad_ca_cert.pem"
+    src: "{{ local_temp_certs_dir }}/nomad_ca_cert.pem"
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0644

@@ -4,6 +4,11 @@ variable "bastion_username" {
   default     = "bastion_user"
 }
 
+variable "ssh_key_name" {
+  type        = string
+  description = "Name of the SSH key configured on Hetzner cloud"
+}
+
 variable "network_ip_range" {
   type        = string
   description = "The CIDR range for the network to be created"
@@ -19,17 +24,17 @@ variable "subnet_ip_range" {
 variable "loadbalancer_count" {
   type        = number
   description = "Number of loadbalancers to create"
-  default     = "1"
+  default     = 1
 }
 
 variable "server_node_count" {
   type        = number
   description = "Number of server nodes to create"
-  default     = "1"
+  default     = 1
 }
 
 variable "client_node_count" {
   type        = number
   description = "Number of client nodes to create"
-  default     = "1"
+  default     = 1
 }

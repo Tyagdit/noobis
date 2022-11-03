@@ -1,15 +1,20 @@
 #### General
-node_name   = "{{ consul_node_name }}"
+node_name   = "consul_{{ node_id }}"
 client_addr = "0.0.0.0"
 server      = true
+ui_config {
+  enabled = true
+}
 
 #### Connection
-# only allow https
 ports {
+  # only allow https
   http  = -1
   https = 8501
   grpc  = 8502
 }
+
+bootstrap_expect = {{ consul_server_count }}
 
 # join the other server nodes
 retry_join = [
@@ -23,20 +28,15 @@ retry_join = [
 {% endif %}
 {% endfor %}
 ]
-bootstrap_expect = {{ consul_server_count }}
-
-ui_config {
-  enabled = true
-}
 
 #### Security
 encrypt = "{{ consul_gossip_encrypt_key }}"
 
 tls {
   defaults {
-    key_file        = "{{ consul_certs_dir }}/server_tls_key.pem"
-    cert_file       = "{{ consul_certs_dir }}/server_tls_cert.pem"
-    ca_file         = "{{ consul_certs_dir }}/ca_cert.pem"
+    key_file        = "{{ consul_certs_dir }}/consul_server_tls_key.pem"
+    cert_file       = "{{ consul_certs_dir }}/consul_server_tls_cert.pem"
+    ca_file         = "{{ consul_certs_dir }}/consul_ca_cert.pem"
     verify_incoming = true
     verify_outgoing = true
   }
@@ -60,8 +60,9 @@ acl {
 ## Connect Service Mesh
 connect {
   enabled = true
-#   ca_provider = "consul"
-#   ca_config {
-#     # ...
-#   }
+  # TODO: figure out if this is needed
+  # ca_provider = "consul"
+  # ca_config {
+  #   # ...
+  # }
 }

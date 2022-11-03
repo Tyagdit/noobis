@@ -1,0 +1,22 @@
+log_level = "INFO"
+
+consul {
+  token = "{{ consul_acl_client_token }}"
+
+  ssl {
+    enabled = true
+    verify  = true
+    key     = "{{ consul_certs_dir }}/consul_client_tls_key.pem"
+    cert    = "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
+    ca_cert = "{{ consul_certs_dir }}/consul_ca_cert.pem"         
+  }
+}
+
+template {
+  source = "{{ consul_template_templates_dir }}/Caddyfile.ctmpl"
+  destination = "/etc/caddy/Caddyfile"
+
+  exec {
+    command = ["caddy", "reload"]
+  }
+}

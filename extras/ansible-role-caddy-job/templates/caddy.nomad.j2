@@ -1,0 +1,66 @@
+job "caddy_job" {
+  region      = "{{ nomad_region }}"
+  datacenters = ["{{ nomad_datacenter }}"]
+  type        = "service"
+
+  # TODO: wtf is this token for, service, node, operator??
+  # consul_token = ""
+
+  # limit to nodes with "loadbalancer" in the nomad agent name
+  constraint {
+    attribute = "${node.unique.name}"
+    operator = "regexp"
+    value = "loadbalancer"
+  }
+
+  group "caddy_group" {
+    network {
+      mode = "bridge"
+
+      port "http" {
+        static = 80
+      }
+
+      port "https" {
+        static = 443
+      }
+    }
+
+    service {
+      provider = "consul"
+      name = "caddy-service"
+    }
+
+    task "caddy" {
+      driver = "docker"
+      config {
+      image = "caddy:{{ caddy_docker_tag }}"
+        ports = ["http", "https"]
+
+        mount {
+          type = "bind"
+          # configs/ in the nomad alloc dir ($NOMAD_TASK_DIR)
+          source = "configs"
+          target = "/etc/caddy"
+          readonly = false
+        }
+
+        mount {
+          type = "bind"
+          # /data/caddy on the host, for TLS data, should be persistent
+          source = "/data/caddy"
+          target = "/data"
+          readonly = false
+        }
+      }
+
+      template {
+        # data = file("./Caddyfile.ctmpl")
+        data = <<EOF
+        {{ lookup('ansible.builtin.template', 'Caddyfile.ctmpl.j2', variable_start_string='[[', variable_end_string=']]') }}
+        EOF
+        destination = "configs/Caddyfile"
+      }
+    }
+  }
+}

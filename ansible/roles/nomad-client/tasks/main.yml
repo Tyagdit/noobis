@@ -1,8 +1,14 @@
 ---
+- name: Create server TLS key and cert
+  include: tls.yml
+
+- name: Create consul ACL token
+  include: consul-acl.yml
+
 - name: Copy Nomad client agents config
-  ansible.builtin.copy:
+  ansible.builtin.template:
     dest: "{{ nomad_config_dir }}/client.hcl"
-    src: "{{ playbook_dir }}/../nomad/client.hcl"
+    src: client.hcl.j2
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0644
@@ -19,6 +25,7 @@
   ansible.builtin.unarchive:
     src: "{{ nomad_cni_url }}"
     dest: "{{ nomad_cni_dir }}"
+    remote_src: true
 
 - name: Allow iptables processing for bridge networks
   ansible.builtin.copy:

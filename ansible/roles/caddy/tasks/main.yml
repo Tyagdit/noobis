@@ -7,6 +7,7 @@
       - apt-transport-https
       - software-properties-common
       - gnupg
+      - unzip
     state: latest
     update_cache: yes
 
@@ -27,16 +28,10 @@
     sttate: present
   ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Copy Caddyfile
-  ansible.builtin.template:
-    dest: /etc/caddy/Caddyfile
-    src: Caddyfile.j2
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0644
+- include: consul-template.yml
 
-- name: Ensure Caddy daemons starts on boot
-  ansible.builtin.systemd:
+- name: Ensure Caddy starts on boot
+  ansible.builtin.service:
     name: caddy.service
     enabled: yes
     state: started
