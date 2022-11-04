@@ -47,7 +47,7 @@ consul_client_count: "{{ terraform_var_client_node_count }}"
 consul_first_server_ip: "{{ hostvars[groups['servers'][0]]['ansible_host'] | default(groups['servers'][0]) }}"
 
 # Nomad
-nomad_config_dir: /etc/nomad.d  # default from deb package
+nomad_config_dir: /etc/nomad.d
 nomad_data_dir: /opt/nomad
 nomad_certs_dir: "{{ nomad_config_dir }}/certs"
 nomad_datacenter: "{{ consul_datacenter }}"
@@ -66,6 +66,7 @@ docker_compose_standalone_url: "https://github.com/docker/compose/releases/downl
 
 # Caddy
 caddy_docker_tag: "2.6.2-alpine"
+caddy_config_dir: /etc/caddy
 caddy_host_domain: ""
 caddy_subdomain_nomad: "nomad"
 caddy_subdomain_consul: "consul"

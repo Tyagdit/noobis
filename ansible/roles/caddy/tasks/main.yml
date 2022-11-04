@@ -30,7 +30,14 @@
 
 - include: consul-template.yml
 
-# TODO: use template for this service
+- name: Copy caddy systemd service
+  ansible.builtin.template:
+    dest: "/etc/systemd/system/caddy.service"
+    src: "caddy.service.j2"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
 - name: Ensure Caddy starts on boot
   ansible.builtin.service:
     name: caddy.service

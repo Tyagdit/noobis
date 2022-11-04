@@ -14,7 +14,7 @@ consul {
 
 template {
   source = "{{ consul_template_templates_dir }}/Caddyfile.ctmpl"
-  destination = "/etc/caddy/Caddyfile"
+  destination = "{{ caddy_config_dir }}/Caddyfile"
 
   exec {
     command = ["caddy", "reload"]
