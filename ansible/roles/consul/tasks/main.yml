@@ -1,0 +1,63 @@
+---
+- name: Install Consul
+  ansible.builtin.apt:
+    name: consul
+    state: present
+    update_cache: yes
+
+- name: Ensure Consul config, data and certs dir exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0755
+  loop:
+    - "{{ consul_config_dir }}"
+    - "{{ consul_data_dir }}"
+    - "{{ consul_certs_dir }}"
+
+- name: Add Consul configurations
+  ansible.builtin.template:
+    dest: "{{ consul_config_dir }}/{{ item.dest }}"
+    src: "{{ item.src }}"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+  loop:
+    - src: "consul.hcl.j2"
+      dest: "consul.hcl"
+    - src: "{{ node_type }}.hcl.j2"
+      dest: "{{ node_type }}.hcl"
+
+- name: Copy consul CA cert over
+  ansible.builtin.copy:
+    dest: "{{ consul_certs_dir }}/consul_ca_cert.pem"
+    src: "{{ local_temp_certs_dir }}/consul_ca_cert.pem"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Create {{ node_type }} TLS key and cert
+  include: tls.yml
+
+- block:
+    - name: Create client ACL token
+      include: acl.yml
+    - name: Setup DNS forwarding on client
+      include: dns.yml
+  when: node_type == "client"
+
+- name: Copy consul systemd service
+  ansible.builtin.template:
+    dest: "/etc/systemd/system/consul.service"
+    src: "consul.service.j2"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Start Consul and ensure it starts on boot
+  ansible.builtin.service:
+    name: consul.service
+    enabled: yes
+    state: started

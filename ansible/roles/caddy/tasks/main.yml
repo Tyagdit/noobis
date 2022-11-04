@@ -30,6 +30,7 @@
 
 - include: consul-template.yml
 
+# TODO: use template for this service
 - name: Ensure Caddy starts on boot
   ansible.builtin.service:
     name: caddy.service

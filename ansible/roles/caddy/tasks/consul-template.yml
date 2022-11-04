@@ -24,7 +24,7 @@
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0644
-  with_items:
+  loop:
     - src: "consul-template.hcl.j2"
       dest: "{{ consul_template_config_dir }}/consul-template.hcl"
     - src: "consul-template.service.j2"

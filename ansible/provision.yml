@@ -31,6 +31,8 @@
   remote_user: "{{ username }}"
   vars_files:
     - vars/main.yml
+  vars:
+    - node_type: "server"
   roles:
     - consul-install
     - consul-server
@@ -42,6 +44,8 @@
   remote_user: "{{ username }}"
   vars_files:
     - vars/main.yml
+  vars:
+    - node_type: "client"
   roles:
     - consul-install
     - consul-client
@@ -54,6 +58,8 @@
   remote_user: "{{ username }}"
   vars_files:
     - vars/main.yml
+  vars:
+    - node_type: "client"
   roles:
     - consul-install
     - consul-client

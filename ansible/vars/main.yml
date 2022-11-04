@@ -12,11 +12,9 @@ local_secrets_dir: "{{ playbook_dir }}/secrets"
 #
 #   all:
 #     - node_id
-#   servers:
-#     - consul_acl_nomad_server_token
+#     - consul_acl_nomad_token
 #   clients:
 #     - consul_acl_client_token
-#     - consul_acl_nomad_client_token
 #   loadbalancers:
 #     - consul_acl_client_token
 #
@@ -39,7 +37,7 @@ terraform_var_server_node_count: 1
 terraform_var_client_node_count: 1
 
 # Consul
-consul_config_dir: /etc/consul.d  # default from deb package
+consul_config_dir: /etc/consul.d
 consul_data_dir: /opt/consul
 consul_certs_dir: "{{ consul_config_dir }}/certs"
 consul_datacenter: "dc1"

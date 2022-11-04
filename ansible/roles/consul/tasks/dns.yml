@@ -1,0 +1,39 @@
+---
+- name: Ensure main systemd-resolved config exists
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf
+    state: touch
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Ensure systemd-resolved config directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0755
+
+# - name: Disable local resolver stub from systemd-resolved
+#   ansible.builtin.lineinfile:
+#     path: /etc/systemd/resolved.conf
+#     regexp: "DNSStubListener"
+#     line: "DNSStubListener=false"
+#     state: present
+
+# TODO: check systemd version and set up iptables rules accordingly
+
+- name: Copy consul DNS forwarding config for systemd-resolved 
+  ansible.builtin.copy:
+    dest: /etc/systemd/resolved.conf.d/consul-dns.conf
+    content: |
+      [Resolve]
+      DNS=127.0.0.1:8600
+      DNSSEC=false
+      Domains=~consul
+
+- name: Restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted

@@ -5,7 +5,7 @@ locals {
     network.ip => {
       node_id = "server_node_${i}"
       # consul ACL token needed by nomad servers
-      consul_acl_nomad_server_token = random_uuid.consul_acl_nomad_server_token[i].result
+      consul_acl_nomad_token = random_uuid.consul_acl_nomad_server_token[i].result
     }
   }
 
@@ -16,7 +16,7 @@ locals {
       # consul ACL token needed by consul clients
       consul_acl_client_token = random_uuid.consul_acl_client_token[i].result
       # consul ACL token needed by nomad clients
-      consul_acl_nomad_client_token = random_uuid.consul_acl_nomad_client_token[i].result
+      consul_acl_nomad_token = random_uuid.consul_acl_nomad_client_token[i].result
     }
   }
 
