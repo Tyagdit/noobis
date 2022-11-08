@@ -2,8 +2,8 @@
 - name: Install consul-template
   ansible.builtin.unarchive:
     src: "{{ consul_template_url }}"
-    dest: "/usr/local/bin/"
-    mode: +x
+    dest: "/usr/bin/"
+    mode: 0755
     remote_src: true
 
 - name: Ensure consul-template config and templates dir exist

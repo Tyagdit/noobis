@@ -56,6 +56,6 @@
 - name: Install docker-compose (standalone)
   ansible.builtin.get_url:
     url: "{{ docker_compose_standalone_url }}"
-    dest: /usr/local/bin/docker-compose
-    mode: +x
+    dest: /usr/bin/docker-compose
+    mode: 0755
   when: docker_install_compose_standalone | bool
