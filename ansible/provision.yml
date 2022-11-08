@@ -34,10 +34,8 @@
   vars:
     - node_type: "server"
   roles:
-    - consul-install
-    - consul-server
-    - nomad-install
-    - nomad-server
+    - consul
+    - nomad
 
 - name: Setup client agents
   hosts: clients
@@ -47,11 +45,9 @@
   vars:
     - node_type: "client"
   roles:
-    - consul-install
-    - consul-client
+    - consul
     - docker
-    - nomad-install
-    - nomad-client
+    - nomad
 
 - name: Setup loadbalancers
   hosts: loadbalancers
@@ -61,6 +57,5 @@
   vars:
     - node_type: "client"
   roles:
-    - consul-install
-    - consul-client
+    - consul
     - caddy
