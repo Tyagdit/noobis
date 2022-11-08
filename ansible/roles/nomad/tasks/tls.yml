@@ -15,19 +15,20 @@
     basic_constraints:
       - CA:FALSE
     key_usage_critical: yes
+    # https://github.com/ansible-collections/community.crypto/blob/a050250153596de36e83891b63f2f171c86b2b2a/plugins/module_utils/crypto/cryptography_support.py#L532
     key_usage:
       - digitalSignature
       - keyEncipherment
-    # TODO: idk what keywords to use in this list
-    # extended_key_usage:
-    #   - TLS Web Server Authentication
-    #   - TLS Web Client Authentication
+    # https://github.com/ansible-collections/community.crypto/blob/a050250153596de36e83891b63f2f171c86b2b2a/tests/integration/targets/x509_certificate_info/tasks/main.yml#L64
+    extended_key_usage:
+      - serverAuth
+      - clientAuth
   register: nomad_csr
 
 - name: Generate nomad {{ node_type }} TLS cert from CSR with in-memory CA key
   community.crypto.x509_certificate:
     path: "{{ nomad_certs_dir }}/nomad_{{ node_type }}_tls_cert.pem"
     csr_content: "{{ nomad_csr.csr }}"
-    ownca_privatekey_content: "{{ nomad_ca_key.privatekey }}"
+    ownca_privatekey_content: "{{ lookup('file', local_temp_certs_dir + '/nomad_ca_key.pem') }}"
     ownca_path: "{{ nomad_certs_dir }}/nomad_ca_cert.pem"
     provider: ownca

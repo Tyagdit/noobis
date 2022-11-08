@@ -1,0 +1,25 @@
+---
+- name: Generate private key for {{ item }} CA cert
+  community.crypto.openssl_privatekey:
+    path: "{{ local_temp_certs_dir }}/{{ item }}_ca_key.pem"
+
+- name: Generate in-memory cert sign request for {{ item }} CA (self-signed) cert
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ local_temp_certs_dir }}/{{ item }}_ca_key.pem"
+    basic_constraints_critical: yes
+    basic_constraints:
+      - CA:TRUE
+    key_usage_critical: yes
+    # https://github.com/ansible-collections/community.crypto/blob/a050250153596de36e83891b63f2f171c86b2b2a/plugins/module_utils/crypto/cryptography_support.py#L532
+    key_usage:
+      - digitalSignature
+      - certificateSign
+      - cRLSign
+  register: __ca_csr
+
+- name: Generate {{ item }} CA cert from CSR
+  community.crypto.x509_certificate:
+    path: "{{ local_temp_certs_dir }}/{{ item }}_ca_cert.pem"
+    csr_content: "{{ __ca_csr.csr }}"
+    privatekey_path: "{{ local_temp_certs_dir }}/{{ item }}_ca_key.pem"
+    provider: selfsigned
