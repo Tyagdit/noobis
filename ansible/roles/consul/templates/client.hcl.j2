@@ -1,5 +1,6 @@
 #### General
 node_name   = "consul_{{ node_id }}"
+# TODO: see if these addresses need changing
 client_addr = "0.0.0.0"
 server      = false
 
@@ -14,11 +15,7 @@ ports {
 # join the server nodes as famileeeeeee
 retry_join = [
 {% for host in groups['servers'] %}
-{% if hostvars[host]['ansible_host'] is defined %}
-  {{ hostvars[host]['ansible_host'] }},
-{% else %}
-  {{ host }},
-{% endif %}
+  {{ hostvars[host]['ansible_host'] | default(host) }},
 {% endfor %}
 ]
 
