@@ -1,10 +1,11 @@
+# TODO: see if addresses need changing
 client {
   enabled  = true
   cni_path = {{ nomad_cni_dir }}
 }
 
 consul {
-  token     = "{{ consul_acl_nomad_client_token }}"
+  token     = "{{ consul_acl_nomad_token }}"
   ssl       = true
   ca_file   = "{{ consul_certs_dir }}/consul_ca_cert.pem"
   key_file  = "{{ consul_certs_dir }}/consul_client_tls_key.pem"
