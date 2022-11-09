@@ -1,0 +1,34 @@
+---
+- name: Generate TLS private key for use with nomad
+  community.crypto.openssl_privatekey:
+    path: "{{ lb_node_certs_dir }}/lb_node_nomad_client_key.pem"
+
+- name: Generate in-memory CSR for use with nomad
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ lb_node_certs_dir }}/lb_node_nomad_client_key.pem"
+    common_name: "client.{{ nomad_region }}.nomad"
+    subject_alt_name:
+      - "DNS:client.{{ nomad_region }}.nomad"
+      - "DNS:localhost"
+      - "IP:127.0.0.1"
+    basic_constraints_critical: yes
+    basic_constraints:
+      - CA:FALSE
+    key_usage_critical: yes
+    # https://github.com/ansible-collections/community.crypto/blob/a050250153596de36e83891b63f2f171c86b2b2a/plugins/module_utils/crypto/cryptography_support.py#L532
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    # https://github.com/ansible-collections/community.crypto/blob/a050250153596de36e83891b63f2f171c86b2b2a/tests/integration/targets/x509_certificate_info/tasks/main.yml#L64
+    extended_key_usage:
+      - serverAuth
+      - clientAuth
+  register: lb_node_csr
+
+- name: Generate TLS cert from CSR for use with nomad
+  community.crypto.x509_certificate:
+    path: "{{ lb_node_certs_dir }}/lb_node_nomad_client_cert.pem"
+    csr_content: "{{ lb_node_csr.csr }}"
+    ownca_privatekey_content: "{{ lookup('file', local_temp_certs_dir + '/nomad_ca_key.pem') }}"
+    ownca_path: "{{ lb_node_certs_dir }}/nomad_ca_cert.pem"
+    provider: ownca

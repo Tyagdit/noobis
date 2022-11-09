@@ -5,8 +5,8 @@
     reverse_proxy {{- range service "http.nomad" }} {{ .Address }}:{{ .Port }} {{- end }} {
         transport http {
             # use nomads's client TLS cert and key since every nomad agent is verifying incoming connections with TLS
-            tls_client_auth [[ nomad_certs_dir ]]/nomad_client_tls_cert.pem [[ nomad_certs_dir ]]/nomad_client_tls_key.pem
-            tls_trusted_ca_certs [[ nomad_certs_dir ]]/nomad_ca_cert.pem
+            tls_client_auth [[ lb_node_certs_dir ]]/lb_node_nomad_client_cert.pem [[ lb_node_certs_dir ]]/lb_node_nomad_client_key.pem
+            tls_trusted_ca_certs [[ lb_node_certs_dir ]]/nomad_ca_cert.pem
         }
     }
 }
@@ -20,6 +20,16 @@
             tls_trusted_ca_certs [[ consul_certs_dir ]]/consul_ca_cert.pem
         }
     }
+}
+
+# Prometheus UI
+[[ caddy_subdomain_prometheus ]].[[ caddy_host_domain ]] {
+    reverse_proxy localhost:9090
+}
+
+# Grafana UI
+[[ caddy_subdomain_grafana ]].[[ caddy_host_domain ]] {
+    reverse_proxy localhost:3000
 }
 
 {{ end -}}

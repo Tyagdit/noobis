@@ -26,6 +26,8 @@ locals {
       node_id = "loadbalancer_${i}"
       # consul ACL token needed by consul clients (loadbalancers in this case)
       consul_acl_client_token = random_uuid.consul_acl_loadbalancer_token[i].result
+      # consul ACL token for prometheus to access consul metrics endpoints
+      consul_acl_prometheus_metrics_token = random_uuid.consul_acl_prometheus_metrics_token[i].result
     }
   }
 }

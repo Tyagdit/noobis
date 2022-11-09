@@ -1,0 +1,75 @@
+---
+global:
+  scrape_interval: "{{ prometheus_scrape_interval }}"
+
+scrape_configs:
+  - job_name: "consul-services-metrics"
+    consul_sd_configs:
+      - server: "localhost:8501"
+        datacenter: "{{ consul_datacenter }}"
+        token: "{{ consul_acl_prometheus_metrics_token }}"
+        scheme: "https"
+        tls_config:
+          key_file: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
+          cert_file: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
+          ca_file: "{{ consul_certs_dir }}/consul_ca_cert.pem"
+    # relabel_configs:
+    #   - source_labels: ["__meta_consul_address"]
+    #     regex: "(.*)"
+    #     replacement: "${1}:{{ consul_proxy_metrics_port }}"
+    #     target_label: "__address__"
+
+  - job_name: "consul-cluster-metrics"
+    scheme: "https"
+    metrics_path: "/v1/agent/metrics"
+    params:
+      format: ["prometheus"]
+    authorization:
+      credentials: "{{ consul_acl_prometheus_metrics_token }}"
+    tls_config:
+      key_file: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
+      cert_file: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
+      ca_file: "{{ consul_certs_dir }}/consul_ca_cert.pem"
+    consul_sd_configs:
+      - server: "localhost:8501"
+        datacenter: "{{ consul_datacenter }}"
+        services: ["consul"]
+        token: "{{ consul_acl_prometheus_metrics_token }}"
+        scheme: "https"
+        tls_config:
+          key_file: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
+          cert_file: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
+          ca_file: "{{ consul_certs_dir }}/consul_ca_cert.pem"
+    # relabel_configs:
+    #   - source_labels: ["__meta_consul_address"]
+    #     regex: "(.*)"
+    #     replacement: "${1}:{{ consul_proxy_metrics_port }}"
+    #     target_label: "__address__"
+
+  - job_name: "nomad-cluster-metrics"
+    scheme: "https"
+    metrics_path: "/v1/metrics"
+    params:
+      format: ["prometheus"]
+    tls_config:
+      key_file: "{{ lb_node_certs_dir }}/lb_node_nomad_client_key.pem"
+      cert_file: "{{ lb_node_certs_dir }}/lb_node_nomad_client_cert.pem"
+      ca_file: "{{ lb_node_certs_dir }}/nomad_ca_cert.pem"
+    consul_sd_configs:
+      - server: "localhost:8501"
+        datacenter: "{{ consul_datacenter }}"
+        services: ["nomad", "nomad-client"]
+        token: "{{ consul_acl_prometheus_metrics_token }}"
+        scheme: "https"
+        tls_config:
+          key_file: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
+          cert_file: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
+          ca_file: "{{ consul_certs_dir }}/consul_ca_cert.pem"
+    relabel_configs:
+      - source_labels: ['__meta_consul_tags']
+        regex: '(.*)http(.*)'
+        action: keep
+    #   - source_labels: ["__meta_consul_address"]
+    #     regex: "(.*)"
+    #     replacement: "${1}:{{ consul_proxy_metrics_port }}"
+    #     target_label: "__address__"

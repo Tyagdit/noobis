@@ -6,6 +6,7 @@
     - vars/main.yml
   vars:
     tfvars:
+      hcloud_token: "{{ terraform_var_hcloud_token }}"
       bastion_username: "{{ terraform_var_bastion_username }}"
       ssh_key_name: "{{ terraform_var_ssh_key_name }}"
       network_ip_range: "{{ terraform_var_network_ip_range }}"
@@ -15,6 +16,11 @@
       client_node_count: "{{ terraform_var_client_node_count }}"
 
   tasks:
+    - name: Ensure hcloud token is provided
+      ansible.builtin.assert:
+        that: terraform_var_hcloud_token != ""
+        fail_msg: "No SSH key name provided, please configure the 'terraform_var_ssh_key_name' variable"
+
     - name: Ensure SSH key name is provided
       ansible.builtin.assert:
         that: terraform_var_ssh_key_name != ""

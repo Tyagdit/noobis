@@ -38,3 +38,10 @@ ui {
     ui_url = "https://{{ caddy_subdomain_consul }}.{{ caddy_host_domain }}:8501/ui"
   }
 }
+
+telemetry {
+  # disable_hostname           = true
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
+  prometheus_metrics         = true
+}

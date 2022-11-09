@@ -17,6 +17,10 @@ resource "random_uuid" "consul_acl_loadbalancer_token" {
   count = length(hcloud_server.loadbalancer)
 }
 
+resource "random_uuid" "consul_acl_prometheus_metrics_token" {
+  count = length(hcloud_server.loadbalancer)
+}
+
 resource "random_uuid" "consul_acl_nomad_server_token" {
   count = length(hcloud_server.server_node)
 }

@@ -1,3 +1,8 @@
+variable "hcloud_token" {
+  type = string
+  description = "The Hetzner Cloud API token"
+}
+
 variable "bastion_username" {
   type        = string
   description = "The user to set up in the bastion"

@@ -1,5 +1,5 @@
 ---
-username: "adi"
+username: "{{ lookup('ansible.builtin.env', 'NOOBIS_USERNAME') | default('noobis') }}"
 local_temp_certs_dir: "{{ playbook_dir }}/certs"
 local_secrets_dir: "{{ playbook_dir }}/secrets"
 # bastion_username: "bastion_user"
@@ -17,6 +17,7 @@ local_secrets_dir: "{{ playbook_dir }}/secrets"
 #     - consul_acl_client_token
 #   loadbalancers:
 #     - consul_acl_client_token
+#     - consul_acl_prometheus_metrics_token
 #
 ## *group* vars provided by terraform:
 #
@@ -28,8 +29,9 @@ local_secrets_dir: "{{ playbook_dir }}/secrets"
 
 # Terraform
 terraform_project_dir: "{{ playbook_dir }}/../terraform"
+terraform_var_hcloud_token: "{{ lookup('ansible.builtin.env', 'HCLOUD_TOKEN') | default('') }}"
 terraform_var_bastion_username: "bastion_user"
-terraform_var_ssh_key_name: ""
+terraform_var_ssh_key_name: "{{ lookup('ansible.builtin.env', 'NOOBIS_HCLOUD_SSH_NAME') | default('') }}"
 terraform_var_network_ip_range: "10.0.0.0/24" 
 terraform_var_subnet_ip_range: "10.0.0.0/28" 
 terraform_var_loadbalancer_count: 1
@@ -45,6 +47,8 @@ consul_server_count: "{{ terraform_var_server_node_count }}"
 consul_client_count: "{{ terraform_var_client_node_count }}"
 # the first server in the inventory for operations on clients before the client is started
 consul_first_server_ip: "{{ hostvars[groups['servers'][0]]['ansible_host'] | default(groups['servers'][0]) }}"
+consul_proxy_metrics_port: "9102"
+consul_prometheus_retention_time: "60s"
 
 # Nomad
 nomad_config_dir: /etc/nomad.d
@@ -56,23 +60,41 @@ nomad_server_count: "{{ terraform_var_server_node_count }}"
 nomad_client_count: "{{ terraform_var_client_node_count }}"
 # nomad_first_server_ip: "{{ consul_first_server_ip }}"
 nomad_cni_dir: /opt/cni/bin
-nomad_cni_version: "v1.0.0"
-nomad_cni_url: "https://github.com/containernetworking/plugins/releases/download/{{ nomad_cni_version }}/cni-plugins-linux-amd64-{{ nomad_cni_version }}.tgz"
+nomad_cni_version: "1.0.0"
+nomad_cni_url: "https://github.com/containernetworking/plugins/releases/download/v{{ nomad_cni_version }}/cni-plugins-linux-amd64-v{{ nomad_cni_version }}.tgz"
 
 # Docker
 docker_install_compose_standalone: true
-docker_compose_standalone_version: "v2.11.1"
-docker_compose_standalone_url: "https://github.com/docker/compose/releases/download/{{ docker_compose_standalone_version }}/docker-compose-Linux-x86_64"
+docker_compose_standalone_version: "2.11.1"
+docker_compose_standalone_url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_standalone_version }}/docker-compose-Linux-x86_64"
 
 # Caddy
 caddy_docker_tag: "2.6.2-alpine"
 caddy_config_dir: /etc/caddy
-caddy_host_domain: ""
+caddy_host_domain: "{{ lookup('ansible.builtin.env', 'NOOBIS_HOST_DOMAIN') | default('') }}"
 caddy_subdomain_nomad: "nomad"
 caddy_subdomain_consul: "consul"
+caddy_subdomain_prometheus: "prometheus"
+caddy_subdomain_grafana: "grafana"
+lb_node_certs_dir: "/etc/caddy/certs"
 
 # consul-template
 consul_template_config_dir: /etc/consul-template.d
 consul_template_templates_dir: "{{ consul_template_config_dir }}/templates"
 consul_template_version: "0.29.5"
 consul_template_url: "https://releases.hashicorp.com/consul-template/{{ consul_template_version }}/consul-template_{{ consul_template_version }}_linux_amd64.zip"
+
+# Prometheus
+prometheus_config_dir: /etc/prometheus
+prometheus_data_dir: /opt/prometheus
+prometheus_storage_retention_time: "30d"
+prometheus_scrape_interval: "30s"
+prometheus_version: "2.39.1"
+prometheus_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+
+# Grafana
+grafana_config_dir: /etc/grafana
+grafana_dashboards_dir: "{{ grafana_config_dir }}/dashboard-jsons"
+grafana_provisioning_dir: "{{ grafana_config_dir }}/provisioning"
+grafana_admin_user: "admin"
+grafana_admin_password: "{{ lookup('ansible.builtin.env', 'NOOBIS_GRAFANA_ADMIN_PASS') | default('admin') }}"

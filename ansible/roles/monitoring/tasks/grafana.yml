@@ -1,0 +1,99 @@
+---
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - software-properties-common
+    state: latest
+    update_cache: yes
+
+- name: Add grafana GPG apt key
+  ansible.builtin.apt_key:
+    url: https://packages.grafana.com/gpg.key
+    keyring: /usr/share/keyrings/grafana.key
+    state: present
+
+- name: Add grafana repository.
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/grafana.key] https://packages.grafana.com/oss/deb stable main
+    state: present
+
+- name: Install grafana
+  ansible.builtin.apt:
+    update_cache: yes
+    name: grafana
+    sttate: present
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Ensure grafana config, provisioning and dashboard dirs exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0755
+  loop:
+    - "{{ grafana_config_dir }}"
+    - "{{ grafana_dashboards_dir }}"
+    - "{{ grafana_provisioning_dir }}"
+    - "{{ grafana_provisioning_dir }}/datasources"
+    - "{{ grafana_provisioning_dir }}/dashboards"
+
+- name: Add grafana config
+  ansible.builtin.template:
+    dest: "{{ grafana_config_dir }}/grafana.ini"
+    src: "grafana.ini.j2"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Add grafana provisioning configs
+  ansible.builtin.template:
+    dest: "{{ grafana_provisioning_dir }}/{{ item.dest }}"
+    src: "{{ item.src }}"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+  loop:
+    - src: grafana-datasources.yml.j2
+      dest: datasources/datasources.yml
+    - src: grafana-dashboards.yml.j2
+      dest: dashboards/dashboards.yml
+
+- name: Add grafana dashboards
+  ansible.builtin.get_url:
+    url: "https://grafana.com/api/dashboards/{{ item.id }}/revisions/{{ item.rev }}/download"
+    dest: "{{ grafana_dashboards_dir }}/{{ item.name }}"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+  loop:
+    - id: 13396
+      rev: 3
+      name: consul-servers.json
+    - id: 15859
+      rev: 2
+      name: consul-mesh.json
+    - id: 16923
+      rev: 1
+      name: nomad-clients.json
+    - id: 16924
+      rev: 1
+      name: nomad-servers.json
+    - id: 16925
+      rev: 1
+      name: nomad-allocs.json
+
+- name: Copy grafana systemd service
+  ansible.builtin.template:
+    dest: "/etc/systemd/system/grafana-server.service"
+    src: "grafana-server.service.j2"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Start grafana and ensure it starts on boot
+  ansible.builtin.service:
+    name: grafana-server.service
+    enabled: yes
+    state: started

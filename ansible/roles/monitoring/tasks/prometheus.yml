@@ -1,0 +1,63 @@
+---
+- name: Get prometheus archive
+  ansible.builtin.unarchive:
+    dest: "/tmp/"
+    src: "{{ prometheus_url }}"
+    remote_src: true
+
+- name: Install prometheus binary
+  ansible.builtin.copy:
+    dest: "/usr/bin/{{ item }}"
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0755
+    remote_src: true
+  loop:
+    - "prometheus"
+    - "promtool"
+
+- name: Copy prometheus console templates and libraries
+  ansible.builtin.copy:
+    dest: "{{ prometheus_config_dir }}/{{ item }}/"
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}/"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0755
+    remote_src: true
+  loop:
+    - "consoles"
+    - "consoles_libraries"
+
+- name: Ensure prometheus config and data dirs exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0755
+  loop:
+    - "{{ prometheus_config_dir }}"
+    - "{{ prometheus_data_dir }}"
+
+- name: Add Prometheus configuration
+  ansible.builtin.template:
+    dest: "{{ prometheus_config_dir }}/prometheus.yml"
+    src: "prometheus.yml.j2"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Copy prometheus systemd service
+  ansible.builtin.template:
+    dest: "/etc/systemd/system/prometheus.service"
+    src: "prometheus.service.j2"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Start prometheus and ensure it starts on boot
+  ansible.builtin.service:
+    name: prometheus.service
+    enabled: yes
+    state: started
