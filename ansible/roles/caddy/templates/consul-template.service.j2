@@ -4,8 +4,8 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-User={{ username }}
-Group={{ username }}
+User=root
+Group=root
 ExecStart=/usr/bin/consul-template -config={{ consul_template_config_dir }}/"
 Restart=on-failure
 

@@ -3,17 +3,11 @@
   ansible.builtin.file:
     path: /etc/systemd/resolved.conf
     state: touch
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0644
 
 - name: Ensure systemd-resolved config directory exists
   ansible.builtin.file:
     path: /etc/systemd/resolved.conf.d
     state: directory
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0755
 
 # - name: Disable local resolver stub from systemd-resolved
 #   ansible.builtin.lineinfile:
@@ -23,12 +17,13 @@
 #     state: present
 
 - name: Check systemd version
-  become: yes
+  become: false
   ansible.builtin.command:
     cmd: systemctl --version
   register: __systemd_version
 
 - name: Set systemd version as fact
+  become: false
   ansible.builtin.set_fact:
     systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
 

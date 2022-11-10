@@ -6,8 +6,8 @@ After=local-fs.target
 
 [Service]
 Type=simple
-User={{ username }}
-Group={{ username }}
+User=prometheus
+Group=prometheus
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/bin/prometheus \
   --config.file={{ prometheus_config_dir }}/prometheus.yml \

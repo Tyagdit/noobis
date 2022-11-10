@@ -24,7 +24,7 @@
           register: __hcloud_token
         - name: set hcloud token fact
           set_fact:
-            terraform_var_hcloud_token: "{{ __hcloud_token }}"
+            terraform_var_hcloud_token: "{{ __hcloud_token.user_input }}"
       when: terraform_var_hcloud_token == ""
       no_log: true
 
@@ -39,13 +39,14 @@
           register: __hcloud_ssh_key_name
         - name: set hcloud ssh key name fact
           set_fact:
-            terraform_var_ssh_key_name: "{{ __hcloud_ssh_key_name }}"
+            terraform_var_ssh_key_name: "{{ __hcloud_ssh_key_name.user_input }}"
       when: terraform_var_ssh_key_name == ""
 
     - assert:
         that: terraform_var_ssh_key_name != ""
         fail_msg: "No Hetzner Cloud SSH key name provided"
 
+    # Terraform apply
     - name: Deploy infrastructure with terraform
       community.general.terraform:
         overwrite_init: no
@@ -54,6 +55,7 @@
         state: present
         variables: "{{ tfvars }}"
 
+    # create the tfvars file for future use directly through terraform
     - name: Create tfvars file
       ansible.builtin.copy:
         content: "{{ tfvars | to_nice_json }}"

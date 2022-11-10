@@ -29,9 +29,6 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0755
   loop:
     - "{{ grafana_config_dir }}"
     - "{{ grafana_dashboards_dir }}"
@@ -43,17 +40,11 @@
   ansible.builtin.template:
     dest: "{{ grafana_config_dir }}/grafana.ini"
     src: "grafana.ini.j2"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0644
 
 - name: Add grafana provisioning configs
   ansible.builtin.template:
     dest: "{{ grafana_provisioning_dir }}/{{ item.dest }}"
     src: "{{ item.src }}"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0644
   loop:
     - src: grafana-datasources.yml.j2
       dest: datasources/datasources.yml
@@ -64,9 +55,6 @@
   ansible.builtin.get_url:
     url: "https://grafana.com/api/dashboards/{{ item.id }}/revisions/{{ item.rev }}/download"
     dest: "{{ grafana_dashboards_dir }}/{{ item.name }}"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0644
   loop:
     - id: 13396
       rev: 3
@@ -88,9 +76,6 @@
   ansible.builtin.template:
     dest: "/etc/systemd/system/grafana-server.service"
     src: "grafana-server.service.j2"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0644
 
 - name: Start grafana and ensure it starts on boot
   ansible.builtin.service:

@@ -3,7 +3,6 @@ username: "{{ lookup('ansible.builtin.env', 'NOOBIS_USERNAME') | default('') }}"
 password: "{{ lookup('ansible.builtin.env', 'NOOBIS_PASSWORD') | default('') }}"
 local_temp_certs_dir: "{{ playbook_dir }}/certs"
 local_secrets_dir: "{{ playbook_dir }}/secrets"
-# bastion_username: "bastion_user"
 ## Debating whether to do this or copy keys from root user
 # ssh_key_path: /home/adi/.ssh/id_ed25519.pub
 # ssh_copy_key: true

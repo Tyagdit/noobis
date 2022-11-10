@@ -1,4 +1,19 @@
 ---
+- name: create prometheus system group
+  ansible.builtin.group:
+    name: prometheus
+    state: present
+    system: true
+
+- name: create prometheus system user
+  ansible.builtin.user:
+    name: prometheus
+    group: prometheus
+    shell: "/usr/sbin/nologin"
+    system: true
+    create_home: false
+    home: "{{ prometheus_data_dir }}"
+
 - name: Get prometheus archive
   ansible.builtin.unarchive:
     dest: "/tmp/"
@@ -9,9 +24,6 @@
   ansible.builtin.copy:
     dest: "/usr/bin/{{ item }}"
     src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0755
     remote_src: true
   loop:
     - "prometheus"
@@ -21,9 +33,6 @@
   ansible.builtin.copy:
     dest: "{{ prometheus_config_dir }}/{{ item }}/"
     src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}/"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0755
     remote_src: true
   loop:
     - "consoles"
@@ -33,9 +42,6 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0755
   loop:
     - "{{ prometheus_config_dir }}"
     - "{{ prometheus_data_dir }}"
@@ -44,17 +50,11 @@
   ansible.builtin.template:
     dest: "{{ prometheus_config_dir }}/prometheus.yml"
     src: "prometheus.yml.j2"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0644
 
 - name: Copy prometheus systemd service
   ansible.builtin.template:
     dest: "/etc/systemd/system/prometheus.service"
     src: "prometheus.service.j2"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0644
 
 - name: Start prometheus and ensure it starts on boot
   ansible.builtin.service:

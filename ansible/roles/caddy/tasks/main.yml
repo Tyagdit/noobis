@@ -3,17 +3,11 @@
   ansible.builtin.file:
     path: "{{ lb_node_certs_dir }}"
     state: directory
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0755
 
 - name: Copy nomad CA cert over
   ansible.builtin.copy:
     dest: "{{ lb_node_certs_dir }}/nomad_ca_cert.pem"
     src: "{{ local_temp_certs_dir }}/nomad_ca_cert.pem"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0644
 
 - include: nomad-tls.yml
 

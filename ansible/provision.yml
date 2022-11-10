@@ -12,7 +12,7 @@
           register: __username
         - name: set username fact
           set_fact:
-            username: "{{ __username }}"
+            username: "{{ __username.user_input }}"
       when: username == ""
 
     - block:
@@ -30,7 +30,7 @@
           register: __password
         - name: set password fact
           set_fact:
-            password: "{{ __password }}"
+            password: "{{ __password.user_input }}"
       when: password == ""
       no_log: true
 
@@ -45,7 +45,7 @@
           register: __host_domain
         - name: set host domain fact
           set_fact:
-            caddy_host_domain: "{{ __host_domain }}"
+            caddy_host_domain: "{{ __host_domain.user_input }}"
       when: caddy_host_domain == ""
 
     - assert:
@@ -58,9 +58,9 @@
             prompt: "Enter password for grafana admin"
             echo: no
           register: __grafana_password
-        - name: set password fact
+        - name: set grafana password fact
           set_fact:
-            grafana_admin_password: "{{ __grafana_password }}"
+            grafana_admin_password: "{{ __grafana_password.user_input }}"
       when: grafana_admin_password == ""
       no_log: true
 
@@ -90,6 +90,7 @@
 - name: Setup server agents
   hosts: servers
   remote_user: "{{ username }}"
+  become: true
   vars_files:
     - vars/main.yml
   vars:
@@ -101,6 +102,7 @@
 - name: Setup client agents
   hosts: clients
   remote_user: "{{ username }}"
+  become: true
   vars_files:
     - vars/main.yml
   vars:
@@ -113,6 +115,7 @@
 - name: Setup loadbalancers
   hosts: loadbalancers
   remote_user: "{{ username }}"
+  become: true
   vars_files:
     - vars/main.yml
   vars:

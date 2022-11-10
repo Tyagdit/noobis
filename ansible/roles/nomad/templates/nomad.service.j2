@@ -13,8 +13,6 @@ After=consul.service
 
 [Service]
 EnvironmentFile=-{{ nomad_config_dir }}/nomad.env
-User={{ username }}
-Group={{ username }}
 ExecStart=/usr/bin/nomad agent -config {{ nomad_config_dir }}
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process

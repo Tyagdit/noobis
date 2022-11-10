@@ -2,6 +2,7 @@
 # using this to make sure the server is running and healthy
 # idk if the leader will ever be needed
 - name: Find consul RAFT leader while checking cluster health
+  become: false
   ansible.builtin.uri:
     url: "https://{{ consul_first_server_ip }}:8501/v1/status/leader"
     ca_path:  "{{ consul_certs_dir }}/consul_ca_cert.pem"
@@ -15,6 +16,7 @@
   run_once: true
 
 - name: Create consul policy for DNS resolving
+  become: false
   ansible.builtin.uri:
     method: PUT
     url: "https://{{ consul_first_server_ip }}:8501/v1/acl/policy"
@@ -39,6 +41,7 @@
   run_once: true
 
 - name: Create ACL token for consul_{{ node_id }}
+  become: false
   ansible.builtin.uri:
     method: PUT
     url: "https://{{ consul_first_server_ip }}:8501/v1/acl/token"

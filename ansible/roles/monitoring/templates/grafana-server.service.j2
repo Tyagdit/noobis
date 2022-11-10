@@ -5,8 +5,8 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-User={{ username }}
-Group={{ username }}
+User=grafana
+Group=grafana
 Type=simple
 Restart=on-failure
 WorkingDirectory=/usr/share/grafana

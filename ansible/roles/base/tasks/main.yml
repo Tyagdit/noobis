@@ -1,10 +1,11 @@
 ---
-- name: Add new non-root user and add it to sudo group
+- name: Add new user with password and add it to sudo group
   ansible.builtin.user:
     name: "{{ username }}"
     state: present
     groups: sudo
     append: yes
+    create_home: true
     password: "{{ password | password_hash('sha512', 65534|random(seed=inventory_hostname)|string) }}"
 
 - name: Add user to passwordless sudoers
@@ -43,7 +44,6 @@
     state: directory
     owner: "{{ username }}"
     group: "{{ username }}"
-    mode: 0755
 
 - name: Copy SSH key from root user
   ansible.builtin.copy:
@@ -52,7 +52,6 @@
     remote_src: yes
     owner: "{{ username }}"
     group: "{{ username }}"
-    mode: 0644
 
 - name: Secure SSH
   ansible.builtin.lineinfile:
@@ -77,3 +76,4 @@
 - name: Add HashiCorp Linux Repository
   ansible.builtin.apt_repository:
     repo: deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main
+  notify: update apt cache

@@ -24,6 +24,7 @@
     extended_key_usage:
       - serverAuth
       - clientAuth
+  # TODO: use hostvars here
   register: consul_csr
 
 - name: Generate consul {{ node_type }} TLS cert from CSR with in-memory CA key
