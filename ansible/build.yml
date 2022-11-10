@@ -16,15 +16,35 @@
       client_node_count: "{{ terraform_var_client_node_count }}"
 
   tasks:
-    - name: Ensure hcloud token is provided
-      ansible.builtin.assert:
-        that: terraform_var_hcloud_token != ""
-        fail_msg: "No SSH key name provided, please configure the 'terraform_var_ssh_key_name' variable"
+    - block:
+        - name: Get hcloud token from user
+          pause:
+            prompt: "Enter your Hetzner Cloud API Token"
+            echo: no
+          register: __hcloud_token
+        - name: set hcloud token fact
+          set_fact:
+            terraform_var_hcloud_token: "{{ __hcloud_token }}"
+      when: terraform_var_hcloud_token == ""
+      no_log: true
 
-    - name: Ensure SSH key name is provided
-      ansible.builtin.assert:
+    - assert:
+        that: terraform_var_hcloud_token != ""
+        fail_msg: "No Hetzner Cloud API token provided"
+
+    - block:
+        - name: Get hcloud SSH key name from user
+          pause:
+            prompt: "Enter your Hetzner Cloud SSH key name"
+          register: __hcloud_ssh_key_name
+        - name: set hcloud ssh key name fact
+          set_fact:
+            terraform_var_ssh_key_name: "{{ __hcloud_ssh_key_name }}"
+      when: terraform_var_ssh_key_name == ""
+
+    - assert:
         that: terraform_var_ssh_key_name != ""
-        fail_msg: "No SSH key name provided, please configure the 'terraform_var_ssh_key_name' variable"
+        fail_msg: "No Hetzner Cloud SSH key name provided"
 
     - name: Deploy infrastructure with terraform
       community.general.terraform:

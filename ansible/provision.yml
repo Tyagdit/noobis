@@ -5,13 +5,70 @@
   vars_files:
     - vars/main.yml
   tasks:
-    - name: Ensure host domain name for caddy is provided
-      ansible.builtin.assert:
-        that: caddy_host_domain != ""
-        fail_msg: "No host domain name provided, please configure the 'caddy_host_domain' variable"
+    - block:
+        - name: Get username from user
+          pause:
+            prompt: "Enter username for user to be created on remote hosts"
+          register: __username
+        - name: set username fact
+          set_fact:
+            username: "{{ __username }}"
+      when: username == ""
 
-    - ansible.builtin.debug:
-        msg: "No admin password provided for grafana, defaulted to 'admin'"
+    - block:
+      - set_fact:
+          username: "noobis"
+      - debug:
+          msg: "No username provided for remote hosts, defaulted to 'noobis'"
+      when: username == ""
+
+    - block:
+        - name: Get password from user
+          pause:
+            prompt: "Enter password for user to be created on remote hosts"
+            echo: no
+          register: __password
+        - name: set password fact
+          set_fact:
+            password: "{{ __password }}"
+      when: password == ""
+      no_log: true
+
+    - assert:
+        that: password != ""
+        fail_msg: "No password provided"
+
+    - block:
+        - name: Get host domain from user
+          pause:
+            prompt: "Enter host domain name for loadbalancer to use"
+          register: __host_domain
+        - name: set host domain fact
+          set_fact:
+            caddy_host_domain: "{{ __host_domain }}"
+      when: caddy_host_domain == ""
+
+    - assert:
+        that: caddy_host_domain != ""
+        fail_msg: "No host domain name provided"
+
+    - block:
+        - name: Get grafana password from user
+          pause:
+            prompt: "Enter password for grafana admin"
+            echo: no
+          register: __grafana_password
+        - name: set password fact
+          set_fact:
+            grafana_admin_password: "{{ __grafana_password }}"
+      when: grafana_admin_password == ""
+      no_log: true
+
+    - block:
+      - set_fact:
+          grafana_admin_password: "admin"
+      - debug:
+          msg: "No admin password provided for grafana, defaulted to 'admin'"
       when: grafana_admin_password == ""
 
 - name: Bootstrap all VMs

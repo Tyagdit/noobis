@@ -1,11 +1,20 @@
 ---
-# Basic setup
 - name: Add new non-root user and add it to sudo group
   ansible.builtin.user:
     name: "{{ username }}"
     state: present
     groups: sudo
     append: yes
+    password: "{{ password | password_hash('sha512', 65534|random(seed=inventory_hostname)|string) }}"
+
+- name: Add user to passwordless sudoers
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    regexp: '^{{ username }}'
+    line: '{{ username }} ALL=(ALL) NOPASSWD: ALL'
+    state: present
+    validate: 'visudo -cf %s'
+    mode: 0440
 
 - name: Update and Upgrade apt cache and packages
   ansible.builtin.apt:
