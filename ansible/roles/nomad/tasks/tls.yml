@@ -2,6 +2,7 @@
 - name: Generate private key for nomad {{ node_type }} TLS cert
   community.crypto.openssl_privatekey:
     path: "{{ nomad_certs_dir }}/nomad_{{ node_type }}_tls_key.pem"
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Generate in-memory CSR for nomad {{ node_type }} TLS cert
   community.crypto.openssl_csr_pipe:
@@ -32,3 +33,4 @@
     ownca_privatekey_content: "{{ lookup('file', local_temp_certs_dir + '/nomad_ca_key.pem') }}"
     ownca_path: "{{ nomad_certs_dir }}/nomad_ca_cert.pem"
     provider: ownca
+  ignore_errors: "{{ ansible_check_mode }}"

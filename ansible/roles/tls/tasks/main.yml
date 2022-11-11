@@ -1,4 +1,9 @@
 ---
+- name: Ensure local certs dir exists
+  ansible.builtin.file:
+    path: "{{ local_temp_certs_dir }}"
+    state: directory
+
 - include: ca.yml
   loop:
     - "consul"

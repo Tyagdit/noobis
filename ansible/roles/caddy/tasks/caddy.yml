@@ -27,6 +27,11 @@
     name: caddy
     sttate: present
 
+- name: Ensure caddy config dir exists
+  ansible.builtin.file:
+    path: "{{ caddy_config_dir }}"
+    state: directory
+
 - name: Copy caddy systemd service
   ansible.builtin.template:
     dest: "/etc/systemd/system/caddy.service"

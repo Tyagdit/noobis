@@ -2,6 +2,7 @@
 - name: Generate private key for {{ item }} CA cert
   community.crypto.openssl_privatekey:
     path: "{{ local_temp_certs_dir }}/{{ item }}_ca_key.pem"
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Generate in-memory cert sign request for {{ item }} CA (self-signed) cert
   community.crypto.openssl_csr_pipe:
@@ -23,3 +24,4 @@
     csr_content: "{{ __ca_csr.csr }}"
     privatekey_path: "{{ local_temp_certs_dir }}/{{ item }}_ca_key.pem"
     provider: selfsigned
+  ignore_errors: "{{ ansible_check_mode }}"

@@ -2,6 +2,7 @@
 - name: Generate private key for consul {{ node_type }} TLS cert
   community.crypto.openssl_privatekey:
     path: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_key.pem"
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Generate in-memory CSR for consul {{ node_type }} TLS cert
   community.crypto.openssl_csr_pipe:
@@ -34,3 +35,4 @@
     ownca_privatekey_content: "{{ lookup('file', local_temp_certs_dir + '/consul_ca_key.pem') }}"
     ownca_path: "{{ consul_certs_dir }}/consul_ca_cert.pem"
     provider: ownca
+  ignore_errors: "{{ ansible_check_mode }}"
