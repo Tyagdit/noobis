@@ -1,5 +1,5 @@
 ---
-username: "{{ lookup('ansible.builtin.env', 'NOOBIS_USERNAME') | default('') }}"
+username: "{{ lookup('ansible.builtin.env', 'NOOBIS_USERNAME') | default('noobis') }}"
 password: "{{ lookup('ansible.builtin.env', 'NOOBIS_PASSWORD') | default('') }}"
 local_temp_certs_dir: "{{ playbook_dir }}/certs"
 local_secrets_dir: "{{ playbook_dir }}/secrets"
@@ -97,4 +97,4 @@ grafana_config_dir: /etc/grafana
 grafana_dashboards_dir: "{{ grafana_config_dir }}/dashboard-jsons"
 grafana_provisioning_dir: "{{ grafana_config_dir }}/provisioning"
 grafana_admin_user: "admin"
-grafana_admin_password: "{{ lookup('ansible.builtin.env', 'NOOBIS_GRAFANA_ADMIN_PASS') | default('') }}"
+grafana_admin_password: "{{ lookup('ansible.builtin.env', 'NOOBIS_GRAFANA_ADMIN_PASS') | default('admin') }}"

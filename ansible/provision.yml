@@ -5,71 +5,13 @@
   vars_files:
     - vars/main.yml
   tasks:
-    - block:
-        - name: Get username from user
-          pause:
-            prompt: "Enter username for user to be created on remote hosts"
-          register: __username
-        - name: set username fact
-          set_fact:
-            username: "{{ __username.user_input }}"
-      when: username == ""
-
-    - block:
-      - set_fact:
-          username: "noobis"
-      - debug:
-          msg: "No username provided for remote hosts, defaulted to 'noobis'"
-      when: username == ""
-
-    - block:
-        - name: Get password from user
-          pause:
-            prompt: "Enter password for user to be created on remote hosts"
-            echo: no
-          register: __password
-        - name: set password fact
-          set_fact:
-            password: "{{ __password.user_input }}"
-      when: password == ""
-      no_log: true
-
     - assert:
         that: password != ""
         fail_msg: "No password provided"
 
-    - block:
-        - name: Get host domain from user
-          pause:
-            prompt: "Enter host domain name for loadbalancer to use"
-          register: __host_domain
-        - name: set host domain fact
-          set_fact:
-            caddy_host_domain: "{{ __host_domain.user_input }}"
-      when: caddy_host_domain == ""
-
     - assert:
         that: caddy_host_domain != ""
         fail_msg: "No host domain name provided"
-
-    - block:
-        - name: Get grafana password from user
-          pause:
-            prompt: "Enter password for grafana admin"
-            echo: no
-          register: __grafana_password
-        - name: set grafana password fact
-          set_fact:
-            grafana_admin_password: "{{ __grafana_password.user_input }}"
-      when: grafana_admin_password == ""
-      no_log: true
-
-    - block:
-      - set_fact:
-          grafana_admin_password: "admin"
-      - debug:
-          msg: "No admin password provided for grafana, defaulted to 'admin'"
-      when: grafana_admin_password == ""
 
 - name: Bootstrap all VMs
   hosts: all
@@ -88,8 +30,10 @@
     - tls
 
 - name: Setup server agents
+  tags:
+    - servers
   hosts: servers
-  remote_user: "{{ username }}"
+  remote_user: "{% if ansible_check_mode %}root{% else %}{{ username }}{% endif %}"
   become: true
   vars_files:
     - vars/main.yml
@@ -100,8 +44,10 @@
     - nomad
 
 - name: Setup client agents
+  tags:
+    - clients
   hosts: clients
-  remote_user: "{{ username }}"
+  remote_user: "{% if ansible_check_mode %}root{% else %}{{ username }}{% endif %}"
   become: true
   vars_files:
     - vars/main.yml
@@ -113,8 +59,10 @@
     - nomad
 
 - name: Setup loadbalancers
+  tags:
+    - lbs
   hosts: loadbalancers
-  remote_user: "{{ username }}"
+  remote_user: "{% if ansible_check_mode %}root{% else %}{{ username }}{% endif %}"
   become: true
   vars_files:
     - vars/main.yml
