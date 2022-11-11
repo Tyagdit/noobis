@@ -22,7 +22,7 @@
   ansible.builtin.apt:
     update_cache: yes
     name: grafana
-    sttate: present
+    state: present
 
 - name: Ensure grafana config, provisioning and dashboard dirs exist
   ansible.builtin.file:

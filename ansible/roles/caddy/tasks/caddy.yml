@@ -25,7 +25,7 @@
   ansible.builtin.apt:
     update_cache: yes
     name: caddy
-    sttate: present
+    state: present
 
 - name: Ensure caddy config dir exists
   ansible.builtin.file:
