@@ -8,6 +8,13 @@ resource "hcloud_firewall" "bastion_firewall" {
     port        = "22"
     source_ips  = ["0.0.0.0/0", "::/0"]
   }
+
+  rule {
+    description = "ICMP from subnet"
+    direction   = "in"
+    protocol    = "icmp"
+    source_ips  = [hcloud_network_subnet.private_subnet.ip_range]
+  }
 }
 
 resource "hcloud_firewall" "loadbalancer_firewall" {
@@ -44,6 +51,13 @@ resource "hcloud_firewall" "loadbalancer_firewall" {
     port        = "any"
     source_ips  = [hcloud_network_subnet.private_subnet.ip_range]
   }
+
+  rule {
+    description = "ICMP from subnet"
+    direction   = "in"
+    protocol    = "icmp"
+    source_ips  = [hcloud_network_subnet.private_subnet.ip_range]
+  }
 }
 
 resource "hcloud_firewall" "server_firewall" {
@@ -55,6 +69,13 @@ resource "hcloud_firewall" "server_firewall" {
     protocol    = "tcp"
     port        = "22"
     source_ips  = [hcloud_server_network.bastion_network.ip]
+  }
+
+  rule {
+    description = "ICMP from subnet"
+    direction   = "in"
+    protocol    = "icmp"
+    source_ips  = [hcloud_network_subnet.private_subnet.ip_range]
   }
 
   rule {
@@ -165,6 +186,13 @@ resource "hcloud_firewall" "client_firewall" {
     direction   = "in"
     protocol    = "udp"
     port        = "any"
+    source_ips  = [hcloud_network_subnet.private_subnet.ip_range]
+  }
+
+  rule {
+    description = "ICMP from subnet"
+    direction   = "in"
+    protocol    = "icmp"
     source_ips  = [hcloud_network_subnet.private_subnet.ip_range]
   }
 }
