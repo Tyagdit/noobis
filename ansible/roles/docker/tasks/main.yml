@@ -29,7 +29,6 @@
       - docker-compose-plugin
       - containerd.io
     state: latest
-  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Create "docker" group
   ansible.builtin.group:
@@ -41,7 +40,6 @@
     name: "{{ username }}"
     groups: docker
     append: yes
-  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Ensure Docker daemons starts on boot
   ansible.builtin.service:
@@ -51,7 +49,6 @@
   loop:
     - docker.service
     - containerd.service
-  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Install docker-compose (standalone)
   ansible.builtin.get_url:

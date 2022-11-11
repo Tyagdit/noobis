@@ -35,6 +35,7 @@
 - block:
     - name: Create client ACL token
       include: acl.yml
+      when: not ansible_check_mode
     - name: Setup DNS forwarding on client
       include: dns.yml
   when: node_type == "client"

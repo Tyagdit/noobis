@@ -26,7 +26,6 @@
     update_cache: yes
     name: caddy
     sttate: present
-  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Copy caddy systemd service
   ansible.builtin.template:
@@ -38,4 +37,3 @@
     name: caddy.service
     enabled: yes
     state: started
-  ignore_errors: "{{ ansible_check_mode }}"

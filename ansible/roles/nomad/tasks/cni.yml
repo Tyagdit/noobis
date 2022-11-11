@@ -9,6 +9,7 @@
     src: "{{ nomad_cni_url }}"
     dest: "{{ nomad_cni_dir }}"
     remote_src: true
+  when: not ansible_check_mode
 
 - name: Allow iptables processing for bridge networks
   ansible.builtin.copy:
@@ -28,3 +29,4 @@
     - net.bridge.bridge-nf-call-arptables
     - net.bridge.bridge-nf-call-ip6tables
     - net.bridge.bridge-nf-call-iptables
+  when: not ansible_check_mode

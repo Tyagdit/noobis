@@ -23,7 +23,6 @@
     update_cache: yes
     name: grafana
     sttate: present
-  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Ensure grafana config, provisioning and dashboard dirs exist
   ansible.builtin.file:

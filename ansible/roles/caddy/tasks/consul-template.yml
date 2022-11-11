@@ -5,6 +5,7 @@
     dest: "/usr/bin/"
     mode: 0755
     remote_src: true
+  when: not ansible_check_mode
 
 - name: Ensure consul-template config and templates dir exist
   ansible.builtin.file:
@@ -36,4 +37,3 @@
     name: consul-template.service
     enabled: yes
     state: started
-  ignore_errors: "{{ ansible_check_mode }}"

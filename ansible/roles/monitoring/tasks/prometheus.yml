@@ -19,6 +19,7 @@
     dest: "/tmp/"
     src: "{{ prometheus_url }}"
     remote_src: true
+  when: not ansible_check_mode
 
 - name: Install prometheus binary
   ansible.builtin.copy:
