@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # add new bastion user
-useradd --shell /usr/sbin/nologin ${BASTION_USER}
+useradd --create-home --home-dir /home/${BASTION_USER} --shell /usr/sbin/nologin ${BASTION_USER}
 
 # update apt
 apt update && apt upgrade
@@ -9,7 +9,7 @@ apt remove snapd
 
 # copy ssh key from root user
 mkdir /home/${BASTION_USER}/.ssh
-cp /root/.ssh/authorized_keys /home/${BASTION_USER}/.ssh/authorized_keys
+cat /root/.ssh/authorized_keys >> /home/${BASTION_USER}/.ssh/authorized_keys
 
 # comment out SSH options that need to be configured and already exist in the config file
 sed -i '
@@ -40,3 +40,5 @@ GatewayPorts no
 AllowAgentForwarding no
 AllowStreamLocalForwarding no
 EOF
+
+systemctl restart sshd
