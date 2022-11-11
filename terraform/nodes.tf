@@ -60,24 +60,13 @@ resource "hcloud_server" "server_node" {
   count = var.server_node_count
 
   public_net {
-    ipv4_enabled = false
+    # need a public net to access the internet
+    ipv4_enabled = true
     ipv6_enabled = false
   }
 
   firewall_ids = [hcloud_firewall.server_firewall.id]
   ssh_keys     = [data.hcloud_ssh_key.default_ssh_key.id]
-
-  network {
-    network_id = hcloud_network_subnet.private_subnet.network_id
-  }
-
-  # NOTE: the depends_on is important when directly attaching the
-  # server to a network. Otherwise Terraform will attempt to create
-  # server and sub-network in parallel. This may result in the server
-  # creation failing randomly.
-  depends_on = [
-    hcloud_network_subnet.private_subnet
-  ]
 }
 
 resource "hcloud_server_network" "server_node_network" {
@@ -95,24 +84,13 @@ resource "hcloud_server" "client_node" {
   count = var.client_node_count
 
   public_net {
-    ipv4_enabled = false
+    # need a public net to access the internet
+    ipv4_enabled = true
     ipv6_enabled = false
   }
 
   firewall_ids = [hcloud_firewall.client_firewall.id]
   ssh_keys     = [data.hcloud_ssh_key.default_ssh_key.id]
-
-  network {
-    network_id = hcloud_network_subnet.private_subnet.network_id
-  }
-
-  # NOTE: the depends_on is important when directly attaching the
-  # server to a network. Otherwise Terraform will attempt to create
-  # server and sub-network in parallel. This may result in the server
-  # creation failing randomly.
-  depends_on = [
-    hcloud_network_subnet.private_subnet
-  ]
 }
 
 resource "hcloud_server_network" "client_node_network" {
