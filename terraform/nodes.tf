@@ -28,6 +28,7 @@ resource "hcloud_server_network" "bastion_network" {
 }
 
 resource "hcloud_server" "loadbalancer" {
+  # TODO: append count.index to the names
   name        = "loadbalancer"
   image       = "ubuntu-22.04"
   server_type = "cx11"
@@ -51,7 +52,7 @@ resource "hcloud_server_network" "loadbalancer_network" {
 }
 
 resource "hcloud_server" "server_node" {
-  name        = "server_node"
+  name        = "server-node"
   image       = "ubuntu-22.04"
   server_type = "cx11"
   location    = "nbg1"
@@ -65,6 +66,18 @@ resource "hcloud_server" "server_node" {
 
   firewall_ids = [hcloud_firewall.server_firewall.id]
   ssh_keys     = [data.hcloud_ssh_key.default_ssh_key.id]
+
+  network {
+    network_id = hcloud_network_subnet.private_subnet.network_id
+  }
+
+  # NOTE: the depends_on is important when directly attaching the
+  # server to a network. Otherwise Terraform will attempt to create
+  # server and sub-network in parallel. This may result in the server
+  # creation failing randomly.
+  depends_on = [
+    hcloud_network_subnet.private_subnet
+  ]
 }
 
 resource "hcloud_server_network" "server_node_network" {
@@ -74,7 +87,7 @@ resource "hcloud_server_network" "server_node_network" {
 }
 
 resource "hcloud_server" "client_node" {
-  name        = "client_node"
+  name        = "client-node"
   image       = "ubuntu-22.04"
   server_type = "cx11"
   location    = "nbg1"
@@ -88,6 +101,18 @@ resource "hcloud_server" "client_node" {
 
   firewall_ids = [hcloud_firewall.client_firewall.id]
   ssh_keys     = [data.hcloud_ssh_key.default_ssh_key.id]
+
+  network {
+    network_id = hcloud_network_subnet.private_subnet.network_id
+  }
+
+  # NOTE: the depends_on is important when directly attaching the
+  # server to a network. Otherwise Terraform will attempt to create
+  # server and sub-network in parallel. This may result in the server
+  # creation failing randomly.
+  depends_on = [
+    hcloud_network_subnet.private_subnet
+  ]
 }
 
 resource "hcloud_server_network" "client_node_network" {

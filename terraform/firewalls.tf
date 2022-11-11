@@ -68,7 +68,7 @@ resource "hcloud_firewall" "server_firewall" {
     direction   = "in"
     protocol    = "tcp"
     port        = "22"
-    source_ips  = [hcloud_server_network.bastion_network.ip]
+    source_ips  = ["${hcloud_server_network.bastion_network.ip}/32"]
   }
 
   rule {
