@@ -1,9 +1,0 @@
----
-- name: restart sshd
-  ansible.builtin.service:
-    name: sshd
-    state: restarted
-
-- name: update apt cache
-  ansible.builtin.apt:
-    update_cache: yes

@@ -65,7 +65,6 @@
       line: "PasswordAuthentication no"
     - regexp: "^PermitRootLogin"
       line: "PermitRootLogin no"
-  notify: restart sshd
 
 # HashiCorp apt repo Setup
 - name: Add HashiCorp GPG apt key
@@ -76,4 +75,12 @@
 - name: Add HashiCorp Linux Repository
   ansible.builtin.apt_repository:
     repo: deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main
-  notify: update apt cache
+
+- name: update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: restart sshd
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
