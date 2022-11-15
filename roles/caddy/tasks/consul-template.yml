@@ -1,0 +1,42 @@
+---
+- name: Install consul-template
+  ansible.builtin.unarchive:
+    src: "{{ consul_template_url }}"
+    dest: "/usr/bin/"
+    mode: 0755
+    remote_src: true
+  when: not ansible_check_mode
+
+- name: Ensure consul-template config and templates dir exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ consul_template_config_dir }}"
+    - "{{ consul_template_templates_dir }}"
+
+- name: Copy consul-template config and service files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - src: "consul-template.hcl.j2"
+      dest: "{{ consul_template_config_dir }}/consul-template.hcl"
+    - src: "consul-template.service.j2"
+      dest: "/etc/systemd/system/consul-template.service"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Copy Caddyfile template
+  ansible.builtin.template:
+    src: Caddyfile.ctmpl.j2
+    dest: "{{ consul_template_templates_dir }}/Caddyfile.ctmpl"
+    variable_start_string: "[["
+    variable_end_string: "]]"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Ensure consul-template starts on boot
+  ansible.builtin.service:
+    name: consul-template.service
+    enabled: yes
+    state: started
+  ignore_errors: "{{ ansible_check_mode }}"

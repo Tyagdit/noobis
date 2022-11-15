@@ -1,0 +1,64 @@
+---
+- name: Ensure main systemd-resolved config exists
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf
+    state: touch
+
+- name: Ensure systemd-resolved config directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+
+# - name: Disable local resolver stub from systemd-resolved
+#   ansible.builtin.lineinfile:
+#     path: /etc/systemd/resolved.conf
+#     regexp: "DNSStubListener"
+#     line: "DNSStubListener=false"
+#     state: present
+
+- name: Check systemd version
+  ansible.builtin.command:
+    cmd: systemctl --version
+  register: __systemd_version
+
+- name: Set systemd version as fact
+  ansible.builtin.set_fact:
+    systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- block:
+    - name: install iptables
+      ansible.builtin.apt:
+        name: iptables
+
+    - name: set iptables rule for DNS forwarding ({{ item }})
+      ansible.builtin.iptables:
+        action: append
+        table: nat
+        chain: OUTPUT
+        destination: localhost
+        protocol: "{{ item }}"
+        match: "{{ item }}"
+        destination_port: 53
+        jump: REDIRECT
+        to_ports: 8600
+      loop:
+        - "tcp"
+        - "udp"
+  when: systemd_version|int < 246
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Copy consul DNS forwarding config for systemd-resolved 
+  ansible.builtin.copy:
+    dest: /etc/systemd/resolved.conf.d/consul-dns.conf
+    content: |
+      [Resolve]
+      DNS=127.0.0.1{% if systemd_version|int >= 246 %}:8600{% endif %}
+      DNSSEC=false
+      Domains=~consul
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted

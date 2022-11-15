@@ -1,0 +1,94 @@
+---
+# using this to make sure the consul server is running and healthy
+# idk if the leader will ever be needed
+- name: Find consul RAFT leader while checking cluster health
+  ansible.builtin.uri:
+    url: "https://{{ consul_first_server_ip }}:8501/v1/status/leader"
+    # i have no clue why the ca_path doesn't work, it doesn't work with the
+    # certs created with 'consul tls create' either, but works when 'verify_incoming'
+    # is false in consul config. BUT when 'verify_incoming' IS false, the request doesn't
+    # work without the ca_path (with validate_certs true) similar weirdness happens
+    # with curl as well
+    # ca_path:  "{{ consul_certs_dir }}/consul_ca_cert.pem"
+    validate_certs: false
+    client_key: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_key.pem"
+    client_cert: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_cert.pem"
+    return_content: yes
+  register: consul_leader
+  until: (consul_leader.json is defined) and (consul_leader.json != '')
+  retries: 20
+  delay: 6
+  run_once: true
+
+- name: Check if nomad-{{ node_type }}-policy already exists
+  ansible.builtin.uri:
+    url: "https://{{ consul_first_server_ip }}:8501/v1/acl/policy/name/nomad-{{ node_type }}-policy"
+    status_code: [200, 403]
+    validate_certs: false
+    client_key: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_key.pem"
+    client_cert: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_cert.pem"
+    return_content: yes
+    headers:
+      X-Consul-Token: "{{ consul_acl_bootstrap_token }}"
+  register: policy_exists
+
+# TODO: do something about the idempotency of this bs
+- name: Create consul policy for nomad {{ node_type }}s
+  ansible.builtin.uri:
+    method: PUT
+    url: "https://{{ consul_first_server_ip }}:8501/v1/acl/policy"
+    validate_certs: false
+    client_key: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_key.pem"
+    client_cert: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_cert.pem"
+    return_content: yes
+    headers:
+      X-Consul-Token: "{{ consul_acl_bootstrap_token }}"
+    body_format: json
+    body:
+      Name: nomad-{{ node_type }}-policy
+      Description: "Policy for nomad {{ node_type }} agents"
+      Rules: |
+        agent_prefix "" {
+          policy = "read"
+        }
+        node_prefix "" {
+          policy = "read"
+        }
+        service_prefix "" {
+          policy = "write"
+        }
+        {% if node_type == "server" %}
+        acl = "write"
+        {% endif %}
+  register: consul_nomad_policy
+  run_once: true
+  when: policy_exists.status == 403 or policy_exists.content == "ACL not found"
+
+- name: Check if token already exists
+  ansible.builtin.uri:
+    url: "https://{{ consul_first_server_ip }}:8501/v1/acl/token/self"
+    status_code: [200, 403]
+    validate_certs: false
+    client_key: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_key.pem"
+    client_cert: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_cert.pem"
+    return_content: yes
+    headers:
+      X-Consul-Token: "{{ consul_acl_nomad_token }}"
+  register: token_exists
+
+- name: Create ACL token for nomad_{{ node_id }}
+  ansible.builtin.uri:
+    method: PUT
+    url: "https://{{ consul_first_server_ip }}:8501/v1/acl/token"
+    validate_certs: false
+    client_key: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_key.pem"
+    client_cert: "{{ consul_certs_dir }}/consul_{{ node_type }}_tls_cert.pem"
+    headers:
+      X-Consul-Token: "{{ consul_acl_bootstrap_token }}"
+    body_format: json
+    body:
+      SecretID: "{{ consul_acl_nomad_token }}"
+      Description: "ACL token for nomad_{{ node_id }}"
+      Policies:
+        - ID: "{% if policy_exists.status == 200 %}{{ policy_exists.json.ID }}{% else %}{{ consul_nomad_policy.json.ID }}{% endif %}"
+  when: token_exists.status == 403 or token_exists.content == "ACL not found"

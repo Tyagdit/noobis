@@ -1,0 +1,68 @@
+---
+- name: create prometheus system group
+  ansible.builtin.group:
+    name: prometheus
+    state: present
+    system: true
+
+- name: create prometheus system user
+  ansible.builtin.user:
+    name: prometheus
+    group: prometheus
+    shell: "/usr/sbin/nologin"
+    system: true
+    create_home: false
+    home: "{{ prometheus_data_dir }}"
+
+- name: Get prometheus archive
+  ansible.builtin.unarchive:
+    dest: "/tmp/"
+    src: "{{ prometheus_url }}"
+    remote_src: true
+  when: not ansible_check_mode
+
+- name: Install prometheus binary
+  ansible.builtin.copy:
+    dest: "/usr/bin/{{ item }}"
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}"
+    remote_src: true
+  loop:
+    - "prometheus"
+    - "promtool"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Copy prometheus console templates and libraries
+  ansible.builtin.copy:
+    dest: "{{ prometheus_config_dir }}/{{ item }}/"
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}/"
+    remote_src: true
+  loop:
+    - "consoles"
+    - "console_libraries"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Ensure prometheus config and data dirs exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ prometheus_config_dir }}"
+    - "{{ prometheus_data_dir }}"
+
+- name: Add Prometheus configuration
+  ansible.builtin.template:
+    dest: "{{ prometheus_config_dir }}/prometheus.yml"
+    src: "prometheus.yml.j2"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Copy prometheus systemd service
+  ansible.builtin.template:
+    dest: "/etc/systemd/system/prometheus.service"
+    src: "prometheus.service.j2"
+
+- name: Start prometheus and ensure it starts on boot
+  ansible.builtin.service:
+    name: prometheus.service
+    enabled: yes
+    state: started
+  ignore_errors: "{{ ansible_check_mode }}"

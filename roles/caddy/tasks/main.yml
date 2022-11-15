@@ -1,0 +1,30 @@
+---
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - debian-keyring
+      - debian-archive-keyring
+      - apt-transport-https
+      - software-properties-common
+      - gnupg
+      - unzip
+    state: latest
+    update_cache: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Ensure certs dir exists
+  ansible.builtin.file:
+    path: "{{ lb_node_certs_dir }}"
+    state: directory
+
+- name: Copy nomad CA cert over
+  ansible.builtin.copy:
+    dest: "{{ lb_node_certs_dir }}/nomad_ca_cert.pem"
+    src: "{{ local_temp_certs_dir }}/nomad_ca_cert.pem"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- include: nomad-tls.yml
+
+- include: consul-template.yml
+
+- include: caddy.yml

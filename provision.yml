@@ -1,0 +1,78 @@
+---
+- name: Pre-provision checks
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - assert:
+        that: password != ""
+        fail_msg: "No password provided"
+
+    - assert:
+        that: caddy_host_domain != ""
+        fail_msg: "No host domain name provided"
+
+- name: Bootstrap all VMs
+  tags:
+    - bootstrap
+  hosts: all
+  remote_user: root
+  vars_files:
+    - vars/main.yml
+  roles:
+    - base
+
+- name: Create TLS keys and certs
+  tags:
+    - bootstrap
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/main.yml
+  roles:
+    - tls
+
+- name: Setup server agents
+  tags:
+    - servers
+  hosts: servers
+  remote_user: "{% if ansible_check_mode %}root{% else %}{{ username }}{% endif %}"
+  become: true
+  vars_files:
+    - vars/main.yml
+  vars:
+    - node_type: "server"
+  roles:
+    - consul
+    - nomad
+
+- name: Setup client agents
+  tags:
+    - clients
+  hosts: clients
+  remote_user: "{% if ansible_check_mode %}root{% else %}{{ username }}{% endif %}"
+  become: true
+  vars_files:
+    - vars/main.yml
+  vars:
+    - node_type: "client"
+  roles:
+    - consul
+    - docker
+    - nomad
+
+- name: Setup loadbalancers
+  tags:
+    - lbs
+  hosts: loadbalancers
+  remote_user: "{% if ansible_check_mode %}root{% else %}{{ username }}{% endif %}"
+  become: true
+  vars_files:
+    - vars/main.yml
+  vars:
+    - node_type: "client"
+  roles:
+    - consul
+    - caddy
+    - monitoring

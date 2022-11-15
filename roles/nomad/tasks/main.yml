@@ -1,0 +1,57 @@
+---
+- name: Install Nomad
+  ansible.builtin.apt:
+    name: nomad
+    state: present
+    update_cache: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Ensure Nomad config, data and certs dir exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ nomad_config_dir }}"
+    - "{{ nomad_data_dir }}"
+    - "{{ nomad_certs_dir }}"
+
+- name: Add Nomad configuration
+  ansible.builtin.template:
+    dest: "{{ nomad_config_dir }}/{{ item.dest }}"
+    src: "{{ item.src }}"
+  loop:
+    - src: "nomad.hcl.j2"
+      dest: "nomad.hcl"
+    - src: "{{ node_type }}.hcl.j2"
+      dest: "{{ node_type }}.hcl"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Copy nomad CA cert over
+  ansible.builtin.copy:
+    dest: "{{ nomad_certs_dir }}/nomad_ca_cert.pem"
+    src: "{{ local_temp_certs_dir }}/nomad_ca_cert.pem"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Create {{ node_type }} TLS key and cert
+  include: tls.yml
+
+- name: Create consul ACL token for nomad {{ node_type }}
+  include: consul-acl.yml
+  when: not ansible_check_mode
+
+- block:
+    - name: Setup CNI plugins for nomad client
+      include: cni.yml
+  when: node_type == "client"
+
+- name: Copy nomad systemd service
+  ansible.builtin.template:
+    dest: "/etc/systemd/system/nomad.service"
+    src: "nomad.service.j2"
+
+- name: Start Nomad and ensure it starts on boot
+  ansible.builtin.service:
+    name: nomad.service
+    enabled: yes
+    state: started
+  ignore_errors: "{{ ansible_check_mode }}"

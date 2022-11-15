@@ -1,5 +1,5 @@
 resource "local_file" "inventory_outfile" {
-  filename        = "${path.module}/../ansible/inventory.yml"
+  filename        = "${path.module}/../inventory.yml"
   file_permission = "0644"
   content = yamlencode({
     # HCL representation of the expected YAML for ansible inventory

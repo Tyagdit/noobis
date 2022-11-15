@@ -1,6 +1,0 @@
----
-- name: Set up prometheus
-  include: prometheus.yml
-
-- name: Set up grafana
-  include: grafana.yml

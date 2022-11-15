@@ -1,0 +1,9 @@
+---
+- name: Set up consul acl for prometheus
+  include: consul-acl.yml
+
+- name: Set up prometheus
+  include: prometheus.yml
+
+- name: Set up grafana
+  include: grafana.yml
