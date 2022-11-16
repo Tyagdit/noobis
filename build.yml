@@ -28,14 +28,14 @@
           client_node_count  = {{ terraform_var_client_node_count }}
 
     # Terraform apply
-    # - name: Deploy infrastructure with terraform
-    #   community.general.terraform:
-    #     overwrite_init: no
-    #     force_init: yes
-    #     project_path: "{{ terraform_project_dir }}"
-    #     state: present
+    - name: Deploy infrastructure with terraform
+      community.general.terraform:
+        overwrite_init: no
+        force_init: yes
+        project_path: "{{ terraform_project_dir }}"
+        state: present
 
-    # - name: Update inventory with inventory created by terraform
-    #   ansible.builtin.meta: refresh_inventory
+    - name: Update inventory with inventory created by terraform
+      ansible.builtin.meta: refresh_inventory
 
-# - import_playbook: provision.yml
+- import_playbook: provision.yml
