@@ -16,7 +16,7 @@ ports {
 # join the server nodes as famileeeeeee
 retry_join = [
 {% for host in groups['servers'] %}
-  {{ hostvars[host]['ansible_host'] | default(host) }},
+  "{{ hostvars[host]['ansible_host'] | default(host) }}",
 {% endfor %}
 ]
 
