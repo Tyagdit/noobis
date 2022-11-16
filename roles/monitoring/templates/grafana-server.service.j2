@@ -14,7 +14,7 @@ WorkingDirectory=/usr/share/grafana
 RuntimeDirectory=grafana
 RuntimeDirectoryMode=0750
 ExecStart=/usr/sbin/grafana-server \
-  --config={{ grafana_config_dir }} \
+  --config={{ grafana_config_dir }}/grafana.ini \
   --pidfile=/run/grafana/grafana-server.pid
 
 

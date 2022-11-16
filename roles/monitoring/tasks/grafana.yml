@@ -29,6 +29,8 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
+    owner: root
+    group: root
   loop:
     - "{{ grafana_config_dir }}"
     - "{{ grafana_dashboards_dir }}"
@@ -40,12 +42,16 @@
   ansible.builtin.template:
     dest: "{{ grafana_config_dir }}/grafana.ini"
     src: "grafana.ini.j2"
+    owner: root
+    group: root
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Add grafana provisioning configs
   ansible.builtin.template:
     dest: "{{ grafana_provisioning_dir }}/{{ item.dest }}"
     src: "{{ item.src }}"
+    owner: root
+    group: root
   loop:
     - src: grafana-datasources.yml.j2
       dest: datasources/datasources.yml
@@ -57,6 +63,8 @@
   ansible.builtin.get_url:
     url: "https://grafana.com/api/dashboards/{{ item.id }}/revisions/{{ item.rev }}/download"
     dest: "{{ grafana_dashboards_dir }}/{{ item.name }}"
+    owner: root
+    group: root
   loop:
     - id: 13396
       rev: 3
