@@ -7,7 +7,7 @@ After=network-online.target
 # TODO: NOT GOOD!!!
 User=root
 Group=root
-ExecStart=/usr/bin/consul-template -config={{ consul_template_config_dir }}/
+ExecStart=/usr/bin/consul-template -config={{ consul_template_config_dir }}/consul-template.hcl
 Restart=on-failure
 
 KillSignal=SIGINT

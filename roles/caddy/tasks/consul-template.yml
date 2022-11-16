@@ -30,8 +30,12 @@
   ansible.builtin.template:
     src: Caddyfile.ctmpl.j2
     dest: "{{ consul_template_templates_dir }}/Caddyfile.ctmpl"
-    variable_start_string: "[["
-    variable_end_string: "]]"
+    # use a jinja2 header within the template file instead of this
+    # using these params makes it so that variable interpolation in the template
+    # doesn't work since that expects the variable to also use these delimiters
+    # can also use lookup('vars') on each variable instead
+    # variable_start_string: "[["
+    # variable_end_string: "]]"
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Ensure consul-template starts on boot
