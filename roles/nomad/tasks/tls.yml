@@ -12,6 +12,7 @@
       - "DNS:{{ node_type }}.{{ nomad_region }}.nomad"
       - "DNS:localhost"
       - "IP:127.0.0.1"
+      - "IP:{{ hostvars[inventory_hostname]['ansible_host'] | default(inventory_hostname) }}"
     basic_constraints_critical: yes
     basic_constraints:
       - CA:FALSE
