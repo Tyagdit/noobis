@@ -87,10 +87,10 @@ resource "hcloud_firewall" "server_firewall" {
   }
 
   rule {
-    description = "Consul gRPC from subnet"
+    description = "Consul gRPC TLS from subnet"
     direction   = "in"
     protocol    = "tcp"
-    port        = "8502"
+    port        = "8503"
     source_ips  = [hcloud_network_subnet.private_subnet.ip_range]
   }
 
