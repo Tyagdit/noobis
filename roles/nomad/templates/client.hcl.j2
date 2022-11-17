@@ -1,10 +1,11 @@
 # TODO: see if addresses need changing
 client {
   enabled  = true
-  cni_path = {{ nomad_cni_dir }}
+  cni_path = "{{ nomad_cni_dir }}"
 }
 
 consul {
+  address   = "127.0.0.1:8501"
   token     = "{{ consul_acl_nomad_token }}"
   ssl       = true
   ca_file   = "{{ consul_certs_dir }}/consul_ca_cert.pem"
@@ -53,7 +54,7 @@ plugin "raw_exec" {
 }
 
 telemetry {
-  # disable_hostname          = true
+  # disable_hostname           = true
   publish_allocation_metrics = true
   publish_node_metrics       = true
   prometheus_metrics         = true

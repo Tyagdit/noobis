@@ -6,6 +6,7 @@ server {
 }
 
 consul {
+  address   = "127.0.0.1:8501"
   token     = "{{ consul_acl_nomad_token }}"
   ssl       = true
   ca_file   = "{{ consul_certs_dir }}/consul_ca_cert.pem"
