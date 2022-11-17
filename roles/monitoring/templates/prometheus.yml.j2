@@ -69,7 +69,7 @@ scrape_configs:
       - source_labels: ['__meta_consul_tags']
         regex: '(.*)http(.*)'
         action: keep
-    #   - source_labels: ["__meta_consul_address"]
-    #     regex: "(.*)"
-    #     replacement: "${1}:{{ consul_proxy_metrics_port }}"
-    #     target_label: "__address__"
+      - source_labels: ["__meta_consul_address"]
+        regex: "(.*)"
+        replacement: "${1}:4646"
+        target_label: "__address__"

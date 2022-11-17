@@ -37,6 +37,9 @@
     - "{{ grafana_provisioning_dir }}"
     - "{{ grafana_provisioning_dir }}/datasources"
     - "{{ grafana_provisioning_dir }}/dashboards"
+    - "{{ grafana_data_dir }}"
+    - "{{ grafana_logs_dir }}"
+    - "{{ grafana_plugins_dir }}"
 
 - name: Add grafana config
   ansible.builtin.template:

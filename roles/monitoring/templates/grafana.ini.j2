@@ -1,7 +1,7 @@
 [paths]
-data = /var/lib/grafana
-logs = /var/log/grafana
-plugins = /var/lib/grafana/plugins
+data = {{ grafana_data_dir }}
+logs = {{ grafana_logs_dir }}
+plugins = {{ grafana_plugins_dir }}
 provisioning = {{ grafana_provisioning_dir }}
 
 [security]
