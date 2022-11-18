@@ -8,17 +8,6 @@
     state: latest
     update_cache: yes
 
-# - name: Add grafana GPG apt key
-#   ansible.builtin.apt_key:
-#     url: https://apt.grafana.com/gpg.key
-#     keyring: /usr/share/keyrings/grafana.key
-#     state: present
-
-# - name: Add grafana repository.
-#   ansible.builtin.apt_repository:
-#     repo: deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com stable main
-#     state: present
-
 - name: Install grafana
   ansible.builtin.apt:
     update_cache: yes
@@ -69,7 +58,7 @@
     owner: root
     group: root
   loop:
-    - id: 13396
+    - id: 10642
       rev: 3
       name: consul-servers.json
     - id: 15859

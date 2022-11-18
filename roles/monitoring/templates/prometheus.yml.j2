@@ -18,6 +18,12 @@ scrape_configs:
         regex: "(.*)"
         replacement: "${1}:{{ consul_proxy_metrics_port }}"
         target_label: "__address__"
+      - source_labels: ['__meta_consul_service']
+        regex: '^nomad(-client)?$'
+        action: drop
+      - source_labels: ['__meta_consul_service']
+        regex: '^consul$'
+        action: drop
 
   - job_name: "consul-cluster-metrics"
     scheme: "https"
