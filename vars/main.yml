@@ -30,6 +30,8 @@ local_secrets_dir: "{{ playbook_dir }}/secrets"
 # Terraform
 terraform_project_dir: "{{ playbook_dir }}/terraform"
 terraform_var_hcloud_token: "{{ lookup('ansible.builtin.env', 'HCLOUD_TOKEN', default='') }}"
+terraform_var_cf_api_token: "{{ lookup('ansible.builtin.env', 'CLOUDFLARE_API_TOKEN', default='') }}"
+terraform_var_cf_zone_name: "{{ lookup('ansible.builtin.env', 'NOOBIS_DOMAIN', default='') }}"
 terraform_var_bastion_username: "bastion_user"
 terraform_var_ssh_key_name: "{{ lookup('ansible.builtin.env', 'NOOBIS_HCLOUD_SSH_NAME', default='') }}"
 terraform_var_network_ip_range: "10.0.0.0/24" 
@@ -71,7 +73,7 @@ docker_compose_standalone_url: "https://github.com/docker/compose/releases/downl
 # Caddy
 caddy_docker_tag: "2.6.2-alpine"
 caddy_config_dir: /etc/caddy
-caddy_host_domain: "{{ lookup('ansible.builtin.env', 'NOOBIS_HOST_DOMAIN', default='') }}"
+caddy_host_domain: "{{ terraform_var_cf_zone_name }}"
 caddy_subdomain_nomad: "nomad"
 caddy_subdomain_consul: "consul"
 caddy_subdomain_prometheus: "prometheus"

@@ -9,10 +9,6 @@
         that: password != ""
         fail_msg: "No password provided"
 
-    - assert:
-        that: caddy_host_domain != ""
-        fail_msg: "No host domain name provided"
-
 - name: Bootstrap all VMs
   tags:
     - bootstrap

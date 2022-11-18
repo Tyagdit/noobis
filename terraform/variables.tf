@@ -3,6 +3,16 @@ variable "hcloud_token" {
   description = "The Hetzner Cloud API token"
 }
 
+variable "cloudflare_api_token" {
+  type = string
+  description = "The Cloudflare API Token to use to edit the Zone's DNS entries"
+}
+
+variable "cloudflare_zone_name" {
+  type = string
+  description = "The Cloudflare Zone name to add DNS entries for"
+}
+
 variable "bastion_username" {
   type        = string
   description = "The user to set up in the bastion"

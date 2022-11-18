@@ -13,19 +13,29 @@
         that: terraform_var_ssh_key_name != ""
         fail_msg: "No Hetzner Cloud SSH key name provided"
 
+    - assert:
+        that: terraform_var_cf_api_token != ""
+        fail_msg: "No Cloudflare API token provided"
+
+    - assert:
+        that: terraform_var_cf_zone_name != ""
+        fail_msg: "No domain name provided"
+
     # create the tfvars file for future use directly through terraform
     - name: Create tfvars file
       ansible.builtin.copy:
         dest: "{{ terraform_project_dir }}/terraform.tfvars"
         content: |
-          hcloud_token       = "{{ terraform_var_hcloud_token }}"
-          bastion_username   = "{{ terraform_var_bastion_username }}"
-          ssh_key_name       = "{{ terraform_var_ssh_key_name }}"
-          network_ip_range   = "{{ terraform_var_network_ip_range }}"
-          subnet_ip_range    = "{{ terraform_var_subnet_ip_range }}"
-          loadbalancer_count = {{ terraform_var_loadbalancer_count }}
-          server_node_count  = {{ terraform_var_server_node_count }}
-          client_node_count  = {{ terraform_var_client_node_count }}
+          hcloud_token         = "{{ terraform_var_hcloud_token }}"
+          cloudflare_api_token = "{{ terraform_var_cf_api_token }}"
+          cloudflare_zone_name = "{{ terraform_var_cf_zone_name }}"
+          bastion_username     = "{{ terraform_var_bastion_username }}"
+          ssh_key_name         = "{{ terraform_var_ssh_key_name }}"
+          network_ip_range     = "{{ terraform_var_network_ip_range }}"
+          subnet_ip_range      = "{{ terraform_var_subnet_ip_range }}"
+          loadbalancer_count   = {{ terraform_var_loadbalancer_count }}
+          server_node_count    = {{ terraform_var_server_node_count }}
+          client_node_count    = {{ terraform_var_client_node_count }}
 
     # Terraform apply
     - name: Deploy infrastructure with terraform
