@@ -59,7 +59,7 @@
     group: root
   loop:
     - id: 10642
-      rev: 3
+      rev: 1
       name: consul-servers.json
     - id: 15859
       rev: 2
