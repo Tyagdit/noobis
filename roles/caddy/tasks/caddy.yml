@@ -31,4 +31,7 @@
     name: caddy.service
     enabled: yes
     state: started
+    # this task fails with "permission denied" due to
+    # some issue with systemd, this should fix that
+    daemon_reexec: true
   ignore_errors: "{{ ansible_check_mode }}"
