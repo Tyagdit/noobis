@@ -11,7 +11,7 @@
 - name: Install grafana
   ansible.builtin.apt:
     update_cache: yes
-    deb: "https://dl.grafana.com/oss/release/grafana_9.2.4_amd64.deb"
+    deb: "https://dl.grafana.com/oss/release/grafana_{{ grafana_version }}_amd64.deb"
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Ensure grafana config, provisioning and dashboard dirs exist
@@ -55,6 +55,7 @@
   ansible.builtin.get_url:
     url: "https://grafana.com/api/dashboards/{{ item.id }}/revisions/{{ item.rev }}/download"
     dest: "{{ grafana_dashboards_dir }}/{{ item.name }}"
+    force: false
     owner: root
     group: root
   loop:
@@ -73,6 +74,31 @@
     - id: 16925
       rev: 1
       name: nomad-allocs.json
+  ignore_errors: "{{ ansible_check_mode }}"
+
+# https://github.com/grafana/grafana/issues/10786
+# doesn't work with the community.grafana.grafana_dashboard module either
+- name: Fix datasources in the dashboard jsons
+  ansible.builtin.replace:
+    path: "{{ grafana_dashboards_dir }}/{{ item.file }}"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  loop:
+    - file: consul-servers.json
+      regexp: '"datasource": "\${DS_PROMETHEUS}"'
+      replace: '"datasource": "Prometheus"'
+    - file: consul-mesh.json
+      regexp: '"uid": "\${DS_THANOS-MASTER}"'
+      replace: '"uid": "Prometheus"'
+    - file: nomad-clients.json
+      regexp: '"uid": "\${DS_PROMETHEUS}"'
+      replace: '"uid": "Prometheus"'
+    - file: nomad-servers.json
+      regexp: '"uid": "\${DS_PROMETHEUS}"'
+      replace: '"uid": "Prometheus"'
+    - file: nomad-allocs.json
+      regexp: '"uid": "\${DS_PROMETHEUS}"'
+      replace: '"uid": "Prometheus"'
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Copy grafana systemd service

@@ -3,30 +3,35 @@ apiVersion: 1
 providers:
   - name: consul-server-metrics
     type: file
+    folder: Consul
     allowUiUpdates: true
     options:
       path: "{{ grafana_dashboards_dir }}/consul-servers.json"
 
   - name: consul-mesh-metrics
     type: file
+    folder: Consul
     allowUiUpdates: true
     options:
       path: "{{ grafana_dashboards_dir }}/consul-mesh.json"
 
   - name: nomad-client-metrics
     type: file
+    folder: Nomad
     allowUiUpdates: true
     options:
       path: "{{ grafana_dashboards_dir }}/nomad-clients.json"
 
   - name: nomad-server-metrics
     type: file
+    folder: Nomad
     allowUiUpdates: true
     options:
       path: "{{ grafana_dashboards_dir }}/nomad-servers.json"
 
   - name: nomad-alloc-metrics
     type: file
+    folder: Nomad
     allowUiUpdates: true
     options:
       path: "{{ grafana_dashboards_dir }}/nomad-allocs.json"
