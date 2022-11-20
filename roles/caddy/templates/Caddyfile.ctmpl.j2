@@ -1,6 +1,5 @@
 #jinja2:variable_start_string:'[[',variable_end_string:']]'
 # TODO: put auth here
-{{- if "[[ caddy_host_domain ]]" -}}
 # Nomad UI
 [[ caddy_subdomain_nomad ]].[[ caddy_host_domain ]] {
     reverse_proxy {{- range service "http.nomad" }} {{ .Address }}:{{ .Port }} {{- end }} {
@@ -33,22 +32,18 @@
     reverse_proxy localhost:3000
 }
 
-{{ end -}}
+{{ range $tag, $services := services | byTag -}}
+  {{- if $tag | regexMatch "userfacing-" -}}
+    {{- range $services -}}
+      {{- if not (.Name | regexMatch "-sidecar-proxy") -}}
+        {{- $subdomain := ($tag | regexReplaceAll ".*userfacing-([\\w-]+):?.*" "$1") -}}
+        {{- scratch.Set "host" (printf "%s.%s" $subdomain "[[ caddy_host_domain ]]") -}}
 
-{{- range services }}
-{{- if .Tags | join "" | regexMatch "userfacing-" }}
-
-  {{- if "[[ caddy_host_domain ]]" -}}
-    {{- $subdomain := .Tags | join ":" | regexReplaceAll ".*userfacing-(.*?):.*" "$1" -}}
-    {{- scratch.Set "host" (printf "%s.%s" $subdomain "[[ caddy_host_domain ]]") -}}
-  {{- else -}}
-    {{- scratch.Set "host" "localhost" -}}
-  {{- end -}}
-
-# TODO: check if localhost even works with this
 {{ scratch.Get "host" }} {
-    reverse_proxy {{- range service .Name }} {{ .Address }}:{{ .Port }} {{- end }}
+    reverse_proxy {{- range connect .Name }} {{ .Address }}:{{ .Port }} {{- end }}
 }
 
-{{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
