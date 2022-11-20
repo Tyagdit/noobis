@@ -18,6 +18,7 @@ template {
   destination = "{{ caddy_config_dir }}/Caddyfile"
 
   exec {
-    command = ["caddy", "reload"]
+    # TODO: this doesn't work
+    command = ["caddy", "reload", "--config", "{{ caddy_config_dir }}/Caddyfile", "--force"]
   }
 }

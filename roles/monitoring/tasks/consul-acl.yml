@@ -32,7 +32,6 @@
       X-Consul-Token: "{{ consul_acl_bootstrap_token }}"
   register: policy_exists
 
-# TODO: do something about the idempotency of this bs
 - name: Create consul policy for service discovery for metrics collection
   ansible.builtin.uri:
     method: PUT
