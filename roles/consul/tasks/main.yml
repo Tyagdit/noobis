@@ -1,10 +1,25 @@
 ---
-- name: Install Consul
+# - name: Install Consul
+#   ansible.builtin.apt:
+#     name: consul
+#     state: present
+#     update_cache: yes
+#   ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Install unzip
   ansible.builtin.apt:
-    name: consul
-    state: present
-    update_cache: yes
+    name: unzip
+    state: latest
   ignore_errors: "{{ ansible_check_mode }}"
+
+# TODO: wait for fix of https://github.com/hashicorp/nomad/issues/15266
+- name: install consul
+  ansible.builtin.unarchive:
+    dest: "/usr/bin/"
+    src: "https://releases.hashicorp.com/consul/1.13.3/consul_1.13.3_linux_amd64.zip"
+    mode: 0755
+    remote_src: true
+  when: not ansible_check_mode
 
 - name: Ensure Consul config, data and certs dir exist
   ansible.builtin.file:
