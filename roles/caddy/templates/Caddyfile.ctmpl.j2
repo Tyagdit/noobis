@@ -33,14 +33,15 @@
 }
 
 {{ range $tag, $services := services | byTag -}}
-  {{- if $tag | regexMatch "userfacing-" -}}
+  {{- if $tag | regexMatch "^userfacing:[\\w-]+:\\d+" -}}
     {{- range $services -}}
       {{- if not (.Name | regexMatch "-sidecar-proxy") -}}
-        {{- $subdomain := ($tag | regexReplaceAll ".*userfacing-([\\w-]+):?.*" "$1") -}}
+        {{- $subdomain := ($tag | regexReplaceAll "^userfacing:([\\w-]+):\\d+" "$1") -}}
         {{- scratch.Set "host" (printf "%s.%s" $subdomain "[[ caddy_host_domain ]]") -}}
+        {{- scratch.Set "service_port" ($tag | regexReplaceAll "^userfacing:[\\w-]+:(\\d+)" "$1") -}}
 
 {{ scratch.Get "host" }} {
-    reverse_proxy {{- range connect .Name }} {{ .Address }}:{{ .Port }} {{- end }}
+    reverse_proxy {{- range service .Name }} {{ .NodeAddress }}:{{ scratch.Get "service_port" }} {{- end }}
 }
 
       {{- end -}}
