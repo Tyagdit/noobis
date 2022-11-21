@@ -39,7 +39,7 @@ source noobis.env
 ansible-playbook build.yml --private-key <path/to/ssh/key>
 ```
 
-### Usage
+## Usage
 
 Once deployed (and once the Cloudflare DNS records have been propagated) the available URLs would be like:
 ```
@@ -72,6 +72,11 @@ ssh -J bastion_user@<lb_ip> <noobis_user>@10.0.0.<x>
 ### Ansible Variables
 
 Edit the [vars/main.yml](/vars/main.yml) file for further configuration
+
+### Service/Job Configuration
+
+- [Read this](#caddy) to understand how to expose a service from the loadbalancer
+- [Read this](#prometheus) to understand how to allow metrics collection from a service's sidecar proxy
 
 ## Deployment Details
 
@@ -124,7 +129,10 @@ Edit the [vars/main.yml](/vars/main.yml) file for further configuration
 
 #### Caddy
 
-- Services that need to be reverse-proxied from caddy should have a consul tag `userfacing-<subdomain>` so consul-template can filter with the `userfacing-` part and the `<subdomain>` part becomes the subdomain that caddy serves
+- Services (i.e Nomad tasks) that need to be reverse-proxied from caddy should have a consul tag `userfacing:<subdomain>:<port>` where:
+    - The `userfacing` part is used to find this service
+    - The `<subdomain>` is the subdomain that caddy should use to reverse-proxy to this service
+    - The `<port>` is the port on the host (i.e the client node) of the service to which caddy should reverse-proxy
 - Only http(s) traffic is allowed into caddy
 - Caddyfile is generated using [consul-template](https://github.com/hashicorp/consul-template)
 
@@ -146,6 +154,15 @@ Edit the [vars/main.yml](/vars/main.yml) file for further configuration
 - TLS verification is used on both outgoing and incoming requests
 - Docker and raw_exec plugins are enabled on the clients
 
+#### Prometheus
+
+- Collects metrics from Consul server agents, all Nomad agents and envoy sidecar proxies configured for it
+- To configure an envoy sidecar proxy in a nomad job to be queried by prometheus, it needs to have:
+    - A port mapping in the `network` stanza specific to prometheus
+    - A **consul** meta tag `prometheus_port` with the value of the host port from the above port mapping
+    - `envoy_prometheus_bind_addr` in the sidecar proxy config set to the service port from the above port mapping
+    - See the [jobs/countdash.nomad](/jobs/countdash.nomad) job file for an example
+
 ## Todo
 
 - [x] DNS record setup
@@ -157,3 +174,4 @@ Edit the [vars/main.yml](/vars/main.yml) file for further configuration
 - [ ] Example services
 - [ ] Post-provision management playbooks (nomad jobs, terraform destroy)
 - [ ] Linting
+- [ ] Update Consul
