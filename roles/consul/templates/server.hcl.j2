@@ -42,6 +42,14 @@ tls {
     verify_outgoing = true
   }
 
+  grpc {
+    # TLS over gRPC doesn't work with envoy since envoy doesn't use the consul
+    # client's certs because that is just for consul's internal communication
+    # which causes consul to reject communication attempted by envoy if 'verify_incoming'
+    # is true, for more info see: https://github.com/hashicorp/consul/issues/13088
+    verify_incoming = false
+  }
+
   internal_rpc {
     verify_server_hostname = true
   }
