@@ -6,7 +6,7 @@ resource "local_file" "inventory_outfile" {
     all = {
       vars = {
         # use the bastion as SSH jump host during ansible tasks (through "user_in_bastion@bastion_public_ip")
-        ansible_ssh_common_args = "-J ${var.bastion_username}@${hcloud_server.bastion.ipv4_address}"
+        ansible_ssh_common_args = "-o StrictHostKeyChecking=accept-new -o ProxyCommand=\"ssh -o StrictHostKeyChecking=accept-new -W %h:%p ${var.bastion_username}@${hcloud_server.bastion.ipv4_address}\""
         # encryption key for consul gossip
         consul_gossip_encrypt_key = random_id.consul_gossip_encrypt_key.b64_std
         # encryption key for nomad gossip
