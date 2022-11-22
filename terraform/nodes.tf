@@ -28,8 +28,7 @@ resource "hcloud_server_network" "bastion_network" {
 }
 
 resource "hcloud_server" "loadbalancer" {
-  # TODO: append count.index to the names
-  name        = "loadbalancer"
+  name        = "loadbalancer-${count.index}"
   image       = "ubuntu-22.04"
   server_type = "cx11"
   location    = "nbg1"
@@ -52,7 +51,7 @@ resource "hcloud_server_network" "loadbalancer_network" {
 }
 
 resource "hcloud_server" "server_node" {
-  name        = "server-node"
+  name        = "server-node-${count.index}"
   image       = "ubuntu-22.04"
   server_type = "cx11"
   location    = "nbg1"
@@ -76,7 +75,7 @@ resource "hcloud_server_network" "server_node_network" {
 }
 
 resource "hcloud_server" "client_node" {
-  name        = "client-node"
+  name        = "client-node-${count.index}"
   image       = "ubuntu-22.04"
   server_type = "cx11"
   location    = "nbg1"
