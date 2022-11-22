@@ -48,4 +48,8 @@
     - name: Update inventory with inventory created by terraform
       ansible.builtin.meta: refresh_inventory
 
+    - name: Wait a while for the instances to finish initializing
+      ansible.builtin.pause:
+        seconds: 10
+
 - import_playbook: provision.yml
