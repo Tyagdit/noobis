@@ -31,7 +31,7 @@ Once deployed you will have:
 cp noobis.env.example noobis.env
 vim noobis.env
 ```
-Edit the env vars according to the [Environment Variables](#environment-variables)
+Edit the env vars according to the [Environment Variables Section](#environment-variables)
 
 ### Deploy
 ```bash
@@ -130,7 +130,6 @@ Edit the [vars/main.yml](/vars/main.yml) file for further configuration
 #### Caddy
 
 - Services (i.e Nomad tasks) that need to be reverse-proxied from caddy should have a consul tag `userfacing:<subdomain>:<port>` where:
-    - The `userfacing` part is used to find this service
     - The `<subdomain>` is the subdomain that caddy should use to reverse-proxy to this service
     - The `<port>` is the port on the host (i.e the client node) of the service to which caddy should reverse-proxy
 - Only http(s) traffic is allowed into caddy
@@ -171,7 +170,7 @@ Edit the [vars/main.yml](/vars/main.yml) file for further configuration
 - [ ] Caddy auth
 - [ ] Logging
 - [ ] More metrics (caddy, node-exporter, prometheus)
-- [ ] Example services
+- [x] Example services
 - [ ] Post-provision management playbooks (nomad jobs, terraform destroy)
 - [ ] Linting
 - [ ] Update Consul
