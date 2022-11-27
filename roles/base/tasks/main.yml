@@ -83,6 +83,12 @@
   ansible.builtin.apt:
     update_cache: yes
 
+- name: Install unzip
+  ansible.builtin.apt:
+    name: unzip
+    state: latest
+  ignore_errors: "{{ ansible_check_mode }}"
+
 - name: restart sshd
   ansible.builtin.service:
     name: sshd

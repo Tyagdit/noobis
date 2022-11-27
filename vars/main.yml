@@ -51,6 +51,10 @@ consul_client_count: "{{ terraform_var_client_node_count }}"
 consul_first_server_ip: "{{ hostvars[groups['servers'][0]]['ansible_host'] | default(groups['servers'][0]) }}"
 consul_proxy_metrics_port: "9102"
 consul_prometheus_retention_time: "60s"
+# https://github.com/hashicorp/nomad/issues/15266
+# https://github.com/hashicorp/nomad/issues/15360
+consul_version: "1.13.3"
+consul_binary_url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
 
 # Nomad
 nomad_config_dir: /etc/nomad.d
@@ -61,6 +65,8 @@ nomad_region: "global"
 nomad_server_count: "{{ terraform_var_server_node_count }}"
 nomad_client_count: "{{ terraform_var_client_node_count }}"
 # nomad_first_server_ip: "{{ consul_first_server_ip }}"
+nomad_version: "1.4.3"
+nomad_binary_url: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_amd64.zip"
 nomad_cni_dir: /opt/cni/bin
 nomad_cni_version: "1.0.0"
 nomad_cni_url: "https://github.com/containernetworking/plugins/releases/download/v{{ nomad_cni_version }}/cni-plugins-linux-amd64-v{{ nomad_cni_version }}.tgz"

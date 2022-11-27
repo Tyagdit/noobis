@@ -1,10 +1,11 @@
 ---
 - name: Install Nomad
-  ansible.builtin.apt:
-    name: nomad
-    state: present
-    update_cache: yes
-  ignore_errors: "{{ ansible_check_mode }}"
+  ansible.builtin.unarchive:
+    dest: "/usr/bin/"
+    src: "{{ nomad_binary_url }}"
+    mode: 0755
+    remote_src: true
+  when: not ansible_check_mode
 
 - name: Ensure Nomad config, data and certs dir exist
   ansible.builtin.file:
