@@ -2,10 +2,7 @@
 - name: Install required packages for Docker on Ubuntu
   ansible.builtin.apt:
     name:
-      - apt-transport-https
       - ca-certificates
-      - software-properties-common
-      - gnupg
       - lsb-release
     state: latest
     update_cache: yes

@@ -50,6 +50,6 @@
 
     - name: Wait a while for the instances to finish initializing
       ansible.builtin.pause:
-        seconds: 10
+        seconds: 15
 
 - import_playbook: provision.yml

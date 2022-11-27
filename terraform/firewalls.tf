@@ -173,6 +173,14 @@ resource "hcloud_firewall" "server_firewall" {
     port        = "4648"
     source_ips  = [hcloud_network_subnet.private_subnet.ip_range]
   }
+
+  rule {
+    description = "node-exporter Port"
+    direction   = "in"
+    protocol    = "tcp"
+    port        = "9100"
+    source_ips  = [hcloud_network_subnet.private_subnet.ip_range]
+  }
 }
 
 resource "hcloud_firewall" "client_firewall" {

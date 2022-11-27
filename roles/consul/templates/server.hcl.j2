@@ -83,7 +83,7 @@ config_entries {
       name = "global"
       config {
         protocol = "http"
-        envoy_prometheus_bind_addr = "0.0.0.0:{{ consul_proxy_metrics_port }}"
+        # envoy_prometheus_bind_addr = "0.0.0.0:{{ consul_proxy_metrics_port }}"
       }
     },
   }

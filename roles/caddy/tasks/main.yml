@@ -4,10 +4,6 @@
     name:
       - debian-keyring
       - debian-archive-keyring
-      - apt-transport-https
-      - software-properties-common
-      - gnupg
-      - unzip
     state: latest
     update_cache: yes
   ignore_errors: "{{ ansible_check_mode }}"

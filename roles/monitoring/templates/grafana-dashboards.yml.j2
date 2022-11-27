@@ -1,6 +1,12 @@
 ---
 apiVersion: 1
 providers:
+  - name: node-exporters
+    type: file
+    allowUiUpdates: true
+    options:
+      path: "{{ grafana_dashboards_dir }}/node-exporters.json"
+
   - name: consul-server-metrics
     type: file
     folder: Consul

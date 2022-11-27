@@ -59,6 +59,9 @@
     owner: root
     group: root
   loop:
+    - id: 1860
+      rev: 29
+      name: node-exporters.json
     - id: 10642
       rev: 1
       name: consul-servers.json
@@ -84,6 +87,9 @@
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
   loop:
+    - file: node-exporters.json
+      regexp: '"uid": "\${DS_PROMETHEUS}"'
+      replace: '"uid": "Prometheus"'
     - file: consul-servers.json
       regexp: '"datasource": "\${DS_PROMETHEUS}"'
       replace: '"datasource": "Prometheus"'
