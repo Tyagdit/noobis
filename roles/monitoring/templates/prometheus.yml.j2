@@ -13,6 +13,14 @@ scrape_configs:
 {% endif %}
 {% endfor %}
 
+  - job_name: "caddy-metrics"
+    static_configs:
+      - targets: ["localhost:2019"]
+
+  - job_name: "prometheus-self-metrics"
+    static_configs:
+      - targets: ["localhost:9090"]
+
   - job_name: "consul-services-metrics"
     consul_sd_configs:
       - server: "localhost:8501"

@@ -62,6 +62,9 @@
     - id: 1860
       rev: 29
       name: node-exporters.json
+    - id: 3662
+      rev: 2
+      name: prometheus.json
     - id: 10642
       rev: 1
       name: consul-servers.json
@@ -90,6 +93,9 @@
     - file: node-exporters.json
       regexp: '"uid": "\${DS_PROMETHEUS}"'
       replace: '"uid": "Prometheus"'
+    - file: prometheus.json
+      regexp: '"datasource": "\${DS_THEMIS}"'
+      replace: '"datasource": "Prometheus"'
     - file: consul-servers.json
       regexp: '"datasource": "\${DS_PROMETHEUS}"'
       replace: '"datasource": "Prometheus"'
@@ -106,6 +112,15 @@
       regexp: '"uid": "\${DS_PROMETHEUS}"'
       replace: '"uid": "Prometheus"'
   ignore_errors: "{{ ansible_check_mode }}"
+
+# this is a modified version of the dashboard used
+# by grafana cloud's caddy integration in that this
+# one actually works (for now)
+# found using https://play.grafana.org/dashboards
+- name: Add caddy dashboard
+  ansible.builtin.copy:
+    dest: "{{ grafana_dashboards_dir }}/caddy.json"
+    src: caddy.json
 
 - name: Copy grafana systemd service
   ansible.builtin.template:

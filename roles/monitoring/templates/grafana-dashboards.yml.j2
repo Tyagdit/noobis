@@ -7,6 +7,18 @@ providers:
     options:
       path: "{{ grafana_dashboards_dir }}/node-exporters.json"
 
+  - name: caddy-metrics
+    type: file
+    allowUiUpdates: true
+    options:
+      path: "{{ grafana_dashboards_dir }}/caddy.json"
+
+  - name: prometheus-self-metrics
+    type: file
+    allowUiUpdates: true
+    options:
+      path: "{{ grafana_dashboards_dir }}/prometheus.json"
+
   - name: consul-server-metrics
     type: file
     folder: Consul
