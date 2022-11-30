@@ -9,6 +9,26 @@
         that: password != ""
         fail_msg: "No password provided"
 
+    - assert:
+        that: password|length >= 8
+        fail_msg: "Password should be at least 8 characters"
+
+    - assert:
+        that: caddy_auth_password != ""
+        fail_msg: "No auth portal password provided"
+
+    - assert:
+        that: caddy_auth_password|length >= 8
+        fail_msg: "Auth portal password should be at least 8 characters"
+
+    - assert:
+        that: username|length >= 3
+        fail_msg: "Username should be at least 3 characters"
+
+    - assert:
+        that: caddy_auth_username|length >= 3
+        fail_msg: "Auth portal username should be at least 3 characters"
+
 - name: Bootstrap all VMs
   tags:
     - bootstrap

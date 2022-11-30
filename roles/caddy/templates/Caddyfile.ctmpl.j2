@@ -3,11 +3,70 @@
     servers {
         metrics
     }
+
+    order authenticate before respond
+    order authorize before basicauth
+
+    security {
+        local identity store local_id_db {
+           realm local
+           path [[ caddy_config_dir ]]/users.json
+        }
+
+        authentication portal auth_portal {
+            enable identity store local_id_db
+            
+            cookie domain [[ caddy_host_domain ]]
+            cookie lifetime 86400 # 24 Hours
+            
+            ui {
+                meta title "Noobis Admin Portal"
+                meta author "tyagdit github.com/tyagdit/noobis"
+                meta description "Noobis Admin Portal"
+                # logo url "https://caddyserver.com/resources/images/caddy-circle-lock.svg"
+                links {
+                    "Nomad" https://[[ caddy_subdomain_nomad ]].[[ caddy_host_domain ]] icon "las la-server"
+                    "Consul" https://[[ caddy_subdomain_consul ]].[[ caddy_host_domain ]] icon "las la-network-wired"
+                    "Prometheus" https://[[ caddy_subdomain_prometheus ]].[[ caddy_host_domain ]] icon "las la-chart-line"
+                    "Grafana" https://[[ caddy_subdomain_grafana ]].[[ caddy_host_domain ]] icon "las la-chart-bar"
+                    "User Settings" /settings icon "las la-cog"
+                    "User Info" /whoami icon "las la-info-circle"
+                }
+            }
+            
+            # transform user {
+            #     match realm local
+            #     action add role authp/admin
+            # }
+        }
+
+        authorization policy admin_policy {
+            set auth url https://auth.[[ caddy_host_domain ]]
+
+            set token sources cookie header
+            validate bearer header
+
+            enable login hint
+            
+            allow roles authp/admin
+
+            # acl rule {
+            #     comment default deny
+            #     match any
+            #     deny log warn
+            # }
+        }
+    }
 }
 
-# TODO: put auth here
+# Authentication portal
+auth.[[ caddy_host_domain ]] {
+    authenticate with auth_portal
+}
+
 # Nomad UI
 [[ caddy_subdomain_nomad ]].[[ caddy_host_domain ]] {
+    authorize with admin_policy
     reverse_proxy {{- range service "http.nomad" }} {{ .Address }}:{{ .Port }} {{- end }} {
         transport http {
             # use nomads's client TLS cert and key since every nomad agent is verifying incoming connections with TLS
@@ -19,6 +78,7 @@
 
 # Consul UI
 [[ caddy_subdomain_consul ]].[[ caddy_host_domain ]] {
+    authorize with admin_policy
     reverse_proxy {{- range service "consul" }} {{ .Address }}:8501 {{- end }} {
         transport http {
             # use consul's client TLS cert and key since every consul agent is verifying incoming connections with TLS
@@ -30,11 +90,13 @@
 
 # Prometheus UI
 [[ caddy_subdomain_prometheus ]].[[ caddy_host_domain ]] {
+    authorize with admin_policy
     reverse_proxy localhost:9090
 }
 
 # Grafana UI
 [[ caddy_subdomain_grafana ]].[[ caddy_host_domain ]] {
+    authorize with admin_policy
     reverse_proxy localhost:3000
 }
 

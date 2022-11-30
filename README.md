@@ -167,9 +167,9 @@ Edit the [vars/main.yml](/vars/main.yml) file for further configuration
 - [x] DNS record setup
 - [ ] Create SSH key if not provided
 - [ ] Append /etc/hosts if no domain provided
-- [ ] Caddy auth
+- [x] Caddy auth
 - [ ] Logging
-- [ ] More metrics (caddy, node-exporter, prometheus)
+- [x] More metrics (caddy, node-exporter, prometheus)
 - [x] Example services
 - [ ] Post-provision management playbooks (nomad jobs, terraform destroy)
 - [ ] Linting

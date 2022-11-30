@@ -77,7 +77,6 @@ docker_compose_standalone_version: "2.11.1"
 docker_compose_standalone_url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_standalone_version }}/docker-compose-Linux-x86_64"
 
 # Caddy
-caddy_docker_tag: "2.6.2-alpine"
 caddy_config_dir: /etc/caddy
 caddy_host_domain: "{{ terraform_var_cf_zone_name }}"
 caddy_subdomain_nomad: "nomad"
@@ -85,6 +84,12 @@ caddy_subdomain_consul: "consul"
 caddy_subdomain_prometheus: "prometheus"
 caddy_subdomain_grafana: "grafana"
 lb_node_certs_dir: "/etc/caddy/certs"
+# caddy binary + caddy-security plugin
+caddy_binary_url: "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fgreenpau%2Fcaddy-security%40v1.1.16&idempotency=69574459084961"
+# caddy security user credentials
+caddy_auth_username: "{{ lookup('ansible.builtin.env', 'NOOBIS_AUTH_PORTAL_USERNAME', default=username) }}"
+caddy_auth_email: "{{ lookup('ansible.builtin.env', 'NOOBIS_AUTH_PORTAL_EMAIL', default=username + '@' + caddy_host_domain) }}"
+caddy_auth_password: "{{ lookup('ansible.builtin.env', 'NOOBIS_AUTH_PORTAL_PASSWORD', default=password) }}"
 
 # consul-template
 consul_template_config_dir: /etc/consul-template.d

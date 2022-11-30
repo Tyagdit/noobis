@@ -1,13 +1,4 @@
 ---
-- name: Install dependencies
-  ansible.builtin.apt:
-    name:
-      - debian-keyring
-      - debian-archive-keyring
-    state: latest
-    update_cache: yes
-  ignore_errors: "{{ ansible_check_mode }}"
-
 - name: Ensure certs dir exists
   ansible.builtin.file:
     path: "{{ lb_node_certs_dir }}"

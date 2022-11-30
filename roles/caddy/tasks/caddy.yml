@@ -1,19 +1,11 @@
 ---
-- name: Add Caddy GPG apt key
-  ansible.builtin.apt_key:
-    url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
-    state: present
-
-- name: Add Caddy repository.
-  ansible.builtin.apt_repository:
-    repo: deb https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main
-    state: present
-
 - name: Install Caddy
-  ansible.builtin.apt:
-    update_cache: yes
-    name: caddy
-    state: present
+  ansible.builtin.get_url:
+    url: "{{ caddy_binary_url }}"
+    dest: "/usr/bin/caddy" 
+    mode: 0755
+    owner: root
+    group: root
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Ensure caddy config dir exists
