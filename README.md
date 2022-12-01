@@ -5,7 +5,7 @@ This is a from-scratch Ansible+Terraform deployment script for a private cloud i
 Once deployed you will have:
 - A server node on Hetzner with a Nomad and Consul server agent
 - A client node on Hetzner with a Nomad and Consul client agent
-- A loadbalancer node with Caddy as a reverse proxy to the Nomad UI, Consul UI, Prometheus UI and Grafana UI as well as any consul services configured to be [userfacing](#caddy)
+- A loadbalancer node with Caddy as an authentication service and a reverse proxy to the Nomad UI, Consul UI, Prometheus UI and Grafana UI as well as any consul services configured to be [userfacing](#caddy)
 - A bastion node to SSH into all of the other nodes
 - DNS entries on Cloudflare for the configured domain
 
@@ -41,16 +41,22 @@ ansible-playbook build.yml --private-key <path/to/ssh/key>
 
 ## Usage
 
-Once deployed (and once the Cloudflare DNS records have been propagated) the available URLs would be like:
+Once deployed (and once the Cloudflare DNS records have been propagated) the available URLs should look like:
 ```
+# Internal
+https://auth.example.com
 https://consul.example.com
 https://nomad.example.com
 https://grafana.example.com
 https://prometheus.example.com
+
+# User-facing
 https://service1.example.com
 https://service2.example.com
 ```
-And SSH into the nodes with 
+The internal links have SSO so the first time you visit any of them you will be redirected for authentication using the configured credentials. You can go to `auth.example.com` to  change the password, access user info and links to internal services
+
+You can SSH into the nodes with 
 ```bash
 ssh -J bastion_user@<lb_ip> <noobis_user>@10.0.0.<x>
 ```
@@ -67,6 +73,9 @@ ssh -J bastion_user@<lb_ip> <noobis_user>@10.0.0.<x>
     - `NOOBIS_PASSWORD` - Password of the linux user that Ansible should create on the remote instances
 - Optional
     - `NOOBIS_USERNAME`(default: noobis) - Name of the linux user to create on the remote hosts
+    - `NOOBIS_AUTH_PORTAL_USERNAME`(default: same as `<NOOBIS_USERNAME>`) - Username used for authentication through the web auth portal
+    - `NOOBIS_AUTH_PORTAL_EMAIL`(default: `<NOOBIS_USERNAME>@<NOOBIS_DOMAIN>`) - Email used for authentication through the web auth portal
+    - `NOOBIS_AUTH_PORTAL_PASSWORD`(default: same as `NOOBIS_PASSWORD`) - Password used for authentication through the web auth portal
     - `NOOBIS_GRAFANA_ADMIN_PASS` (default: admin) - Password for the admin user on grafana
 
 ### Ansible Variables
@@ -134,6 +143,7 @@ Edit the [vars/main.yml](/vars/main.yml) file for further configuration
     - The `<port>` is the port on the host (i.e the client node) of the service to which caddy should reverse-proxy
 - Only http(s) traffic is allowed into caddy
 - Caddyfile is generated using [consul-template](https://github.com/hashicorp/consul-template)
+- [caddy-security](https://github.com/greenpau/caddy-security) is used to provide SSO, configured to use a local identity store with a single registered user (using credentials from the [env vars](#environment-variables))
 
 #### Ansible
 
@@ -174,3 +184,4 @@ Edit the [vars/main.yml](/vars/main.yml) file for further configuration
 - [ ] Post-provision management playbooks (nomad jobs, terraform destroy)
 - [ ] Linting
 - [ ] Update Consul
+- [ ] Provision root domain too
