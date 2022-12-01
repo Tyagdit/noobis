@@ -3,6 +3,7 @@ inventory.yml
 **/certs/
 **/secrets/
 *.env
+ansible.local.cfg
 
 # terraform
 # Local .terraform directories
