@@ -5,9 +5,8 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-# TODO: NOT GOOD!!!
-User=root
-Group=root
+User=grafana
+Group=grafana
 Type=simple
 Restart=on-failure
 WorkingDirectory=/usr/share/grafana
@@ -36,6 +35,7 @@ ProtectKernelModules=true
 ProtectKernelTunables=true
 ProtectProc=invisible
 ProtectSystem=full
+ReadWritePaths={{ grafana_data_dir }} {{ grafana_logs_dir }} {{ grafana_plugins_dir }} {{ grafana_provisioning_dir }} {{ grafana_dashboards_dir }}
 RemoveIPC=true
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 RestrictNamespaces=true

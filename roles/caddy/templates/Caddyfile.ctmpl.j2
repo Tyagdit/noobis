@@ -82,8 +82,8 @@ auth.[[ caddy_host_domain ]] {
     reverse_proxy {{- range service "consul" }} {{ .Address }}:8501 {{- end }} {
         transport http {
             # use consul's client TLS cert and key since every consul agent is verifying incoming connections with TLS
-            tls_client_auth [[ consul_certs_dir ]]/consul_client_tls_cert.pem [[ consul_certs_dir ]]/consul_client_tls_key.pem
-            tls_trusted_ca_certs [[ consul_certs_dir ]]/consul_ca_cert.pem
+            tls_client_auth [[ lb_node_certs_dir ]]/lb_node_consul_client_cert.pem [[ lb_node_certs_dir ]]/lb_node_consul_client_key.pem
+            tls_trusted_ca_certs [[ lb_node_certs_dir ]]/consul_ca_cert.pem
         }
     }
 }

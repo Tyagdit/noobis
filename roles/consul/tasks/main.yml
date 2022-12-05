@@ -1,4 +1,18 @@
 ---
+- name: create consul system group
+  ansible.builtin.group:
+    name: consul
+    state: present
+    system: true
+
+- name: create consul system user
+  ansible.builtin.user:
+    name: consul
+    group: consul
+    shell: "/usr/sbin/nologin"
+    system: true
+    create_home: false
+
 - name: Install Consul
   ansible.builtin.unarchive:
     dest: "/usr/bin/"
@@ -11,6 +25,8 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
+    owner: consul
+    group: consul
   loop:
     - "{{ consul_config_dir }}"
     - "{{ consul_data_dir }}"
@@ -20,6 +36,8 @@
   ansible.builtin.template:
     dest: "{{ consul_config_dir }}/{{ item.dest }}"
     src: "{{ item.src }}"
+    owner: consul
+    group: consul
   loop:
     - src: "consul.hcl.j2"
       dest: "consul.hcl"
@@ -31,6 +49,8 @@
   ansible.builtin.copy:
     dest: "{{ consul_certs_dir }}/consul_ca_cert.pem"
     src: "{{ local_temp_certs_dir }}/consul_ca_cert.pem"
+    owner: consul
+    group: consul
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Create {{ node_type }} TLS key and cert

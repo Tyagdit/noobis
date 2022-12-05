@@ -7,9 +7,9 @@ consul {
   ssl {
     enabled = true
     verify  = true
-    key     = "{{ consul_certs_dir }}/consul_client_tls_key.pem"
-    cert    = "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
-    ca_cert = "{{ consul_certs_dir }}/consul_ca_cert.pem"         
+    key     = "{{ lb_node_certs_dir }}/lb_node_consul_client_key.pem"
+    cert    = "{{ lb_node_certs_dir }}/lb_node_consul_client_cert.pem"
+    ca_cert = "{{ lb_node_certs_dir }}/consul_ca_cert.pem"         
   }
 }
 

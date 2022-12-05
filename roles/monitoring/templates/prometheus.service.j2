@@ -6,9 +6,8 @@ After=local-fs.target
 
 [Service]
 Type=simple
-# TODO: NOT GOOD!!!
-User=root
-Group=root
+User=prometheus
+Group=prometheus
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/bin/prometheus \
   --config.file={{ prometheus_config_dir }}/prometheus.yml \

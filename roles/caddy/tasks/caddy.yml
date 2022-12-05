@@ -4,14 +4,14 @@
     url: "{{ caddy_binary_url }}"
     dest: "/usr/bin/caddy" 
     mode: 0755
-    owner: root
-    group: root
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Ensure caddy config dir exists
   ansible.builtin.file:
     path: "{{ caddy_config_dir }}"
     state: directory
+    owner: caddy
+    group: caddy
 
 - name: Copy caddy systemd service
   ansible.builtin.template:

@@ -9,6 +9,8 @@
   ansible.builtin.user:
     name: prometheus
     group: prometheus
+    groups: caddy
+    append: true
     shell: "/usr/sbin/nologin"
     system: true
     create_home: false
@@ -36,6 +38,8 @@
   ansible.builtin.copy:
     dest: "{{ prometheus_config_dir }}/{{ item }}/"
     src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}/"
+    owner: prometheus
+    group: prometheus
     remote_src: true
   loop:
     - "consoles"
@@ -46,6 +50,8 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
+    owner: prometheus
+    group: prometheus
   loop:
     - "{{ prometheus_config_dir }}"
     - "{{ prometheus_data_dir }}"
@@ -54,6 +60,8 @@
   ansible.builtin.template:
     dest: "{{ prometheus_config_dir }}/prometheus.yml"
     src: "prometheus.yml.j2"
+    owner: prometheus
+    group: prometheus
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Copy prometheus systemd service

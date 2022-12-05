@@ -1,13 +1,17 @@
 ---
-- name: Install apt packages
-  ansible.builtin.apt:
-    name:
-      - apt-transport-https
-      - software-properties-common
-      - gnupg
-      - unzip
-    state: latest
-  ignore_errors: "{{ ansible_check_mode }}"
+- name: create nodeexp system group
+  ansible.builtin.group:
+    name: nodeexp
+    state: present
+    system: true
+
+- name: create nodeexp system user
+  ansible.builtin.user:
+    name: nodeexp
+    group: nodeexp
+    shell: "/usr/sbin/nologin"
+    system: true
+    create_home: false
 
 - name: get node-exporter archive
   ansible.builtin.unarchive:

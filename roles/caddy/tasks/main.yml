@@ -1,13 +1,51 @@
 ---
+- name: create caddy system group
+  ansible.builtin.group:
+    name: caddy
+    state: present
+    system: true
+
+- name: create caddy system user
+  ansible.builtin.user:
+    name: caddy
+    group: caddy
+    shell: "/usr/sbin/nologin"
+    system: true
+    home: /home/caddy
+
 - name: Ensure certs dir exists
   ansible.builtin.file:
     path: "{{ lb_node_certs_dir }}"
     state: directory
+    owner: caddy
+    group: caddy
+
+- name: copy consul tls certs
+  ansible.builtin.copy:
+    src: "{{ consul_certs_dir }}/{{ item.src }}"
+    dest: "{{ lb_node_certs_dir }}/{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: caddy
+    group: caddy
+    remote_src: yes
+  loop:
+    - src: consul_client_tls_key.pem
+      dest: lb_node_consul_client_key.pem
+      mode: 640
+    - src: consul_client_tls_cert.pem
+      dest: lb_node_consul_client_cert.pem
+      mode: 644
+    - src: consul_ca_cert.pem
+      dest: consul_ca_cert.pem
+      mode: 644
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Copy nomad CA cert over
   ansible.builtin.copy:
     dest: "{{ lb_node_certs_dir }}/nomad_ca_cert.pem"
     src: "{{ local_temp_certs_dir }}/nomad_ca_cert.pem"
+    owner: caddy
+    group: caddy
   ignore_errors: "{{ ansible_check_mode }}"
 
 - include: nomad-tls.yml

@@ -4,11 +4,13 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-# TODO: NOT GOOD!!!
-User=root
-Group=root
+User=caddy
+Group=caddy
 ExecStart=/usr/bin/consul-template -config={{ consul_template_config_dir }}/consul-template.hcl
 Restart=on-failure
+ReadWritePaths={{ caddy_config_dir }}
+PrivateTmp=true
+ProtectSystem=full
 
 KillSignal=SIGINT
 ExecReload=/bin/kill -HUP $MAINPID

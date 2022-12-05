@@ -1,4 +1,20 @@
 ---
+- name: create grafana system group
+  ansible.builtin.group:
+    name: grafana
+    state: present
+    system: true
+
+- name: create grafana system user
+  ansible.builtin.user:
+    name: grafana
+    group: grafana
+    groups: caddy
+    append: true
+    shell: "/usr/sbin/nologin"
+    system: true
+    create_home: false
+
 - name: Install dependencies
   ansible.builtin.apt:
     name:
@@ -18,8 +34,8 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: root
-    group: root
+    owner: grafana
+    group: grafana
   loop:
     - "{{ grafana_config_dir }}"
     - "{{ grafana_dashboards_dir }}"
@@ -34,16 +50,16 @@
   ansible.builtin.template:
     dest: "{{ grafana_config_dir }}/grafana.ini"
     src: "grafana.ini.j2"
-    owner: root
-    group: root
+    owner: grafana
+    group: grafana
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Add grafana provisioning configs
   ansible.builtin.template:
     dest: "{{ grafana_provisioning_dir }}/{{ item.dest }}"
     src: "{{ item.src }}"
-    owner: root
-    group: root
+    owner: grafana
+    group: grafana
   loop:
     - src: grafana-datasources.yml.j2
       dest: datasources/datasources.yml
@@ -56,8 +72,8 @@
     url: "https://grafana.com/api/dashboards/{{ item.id }}/revisions/{{ item.rev }}/download"
     dest: "{{ grafana_dashboards_dir }}/{{ item.name }}"
     force: false
-    owner: root
-    group: root
+    owner: grafana
+    group: grafana
   loop:
     - id: 1860
       rev: 29
@@ -121,6 +137,8 @@
   ansible.builtin.copy:
     dest: "{{ grafana_dashboards_dir }}/caddy.json"
     src: caddy.json
+    owner: grafana
+    group: grafana
 
 - name: Copy grafana systemd service
   ansible.builtin.template:

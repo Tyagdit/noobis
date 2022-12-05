@@ -12,9 +12,8 @@ Requires=network-online.target
 
 [Service]
 Type=notify
-# TODO: NOT GOOD!!!
-User=root
-Group=root
+User=caddy
+Group=caddy
 Environment="AUTHP_ADMIN_USER={{ caddy_auth_username }}"
 Environment="AUTHP_ADMIN_EMAIL={{ caddy_auth_email }}"
 Environment="AUTHP_ADMIN_SECRET={{ caddy_auth_password }}"
@@ -23,7 +22,7 @@ ExecReload=/usr/bin/caddy reload --config {{ caddy_config_dir }}/Caddyfile --for
 TimeoutStopSec=5s
 LimitNOFILE=1048576
 LimitNPROC=512
-ReadWritePaths=/etc/caddy
+ReadWritePaths={{ caddy_config_dir }}
 PrivateTmp=true
 ProtectSystem=full
 AmbientCapabilities=CAP_NET_BIND_SERVICE

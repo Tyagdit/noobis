@@ -16,6 +16,7 @@ EnvironmentFile=-{{ nomad_config_dir }}/nomad.env
 {% if node_type == "client" %}
 Environment="CONSUL_HTTP_SSL=true"
 Environment="CONSUL_HTTP_ADDR=127.0.0.1:8501"
+#Environment="CONSUL_GRPC_ADDR=127.0.0.1:8503"
 Environment="CONSUL_CACERT={{ consul_certs_dir }}/consul_ca_cert.pem"
 Environment="CONSUL_CLIENT_KEY={{ consul_certs_dir }}/consul_client_tls_key.pem"
 Environment="CONSUL_CLIENT_CERT={{ consul_certs_dir }}/consul_client_tls_cert.pem"

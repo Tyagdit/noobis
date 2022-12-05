@@ -11,19 +11,18 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
+    owner: caddy
+    group: caddy
   loop:
     - "{{ consul_template_config_dir }}"
     - "{{ consul_template_templates_dir }}"
 
-- name: Copy consul-template config and service files
+- name: Copy consul-template config file
   ansible.builtin.template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-  loop:
-    - src: "consul-template.hcl.j2"
-      dest: "{{ consul_template_config_dir }}/consul-template.hcl"
-    - src: "consul-template.service.j2"
-      dest: "/etc/systemd/system/consul-template.service"
+    src: consul-template.hcl.j2
+    dest: "{{ consul_template_config_dir }}/consul-template.hcl"
+    owner: caddy
+    group: caddy
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Copy Caddyfile template
@@ -36,6 +35,14 @@
     # can also use lookup('vars') on each variable instead
     # variable_start_string: "[["
     # variable_end_string: "]]"
+    owner: caddy
+    group: caddy
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Copy consul-template systemd service file
+  ansible.builtin.template:
+    src: consul-template.service.j2
+    dest: "/etc/systemd/system/consul-template.service"
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Ensure consul-template starts on boot

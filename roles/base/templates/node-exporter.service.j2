@@ -4,8 +4,8 @@ After=network-online.target
 
 [Service]
 Type=simple
-User=root
-Group=root
+User=nodeexp
+Group=nodeexp
 ExecStart=/usr/bin/node_exporter \
     --collector.systemd \
     --collector.ethtool \
