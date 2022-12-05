@@ -1,5 +1,5 @@
 #### General
-node_name   = "consul_{{ node_id }}"
+node_name   = "consul-{{ node_id }}"
 # TODO: see if these addresses need changing
 client_addr = "0.0.0.0"
 bind_addr   = "{{ hostvars[inventory_hostname]['ansible_host'] | default(inventory_hostname) }}"

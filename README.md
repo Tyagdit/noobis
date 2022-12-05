@@ -38,6 +38,7 @@ Edit the env vars according to the [Environment Variables Section](#environment-
 source noobis.env
 ansible-playbook build.yml --private-key <path/to/ssh/key>
 ```
+And wait ~15 minutes
 
 ## Usage
 
@@ -184,4 +185,4 @@ Edit the [vars/main.yml](/vars/main.yml) file for further configuration
 - [ ] Post-provision management playbooks (nomad jobs, terraform destroy)
 - [ ] Linting
 - [ ] Update Consul
-- [ ] Provision root domain too
+- [ ] ~~Provision root domain too~~
