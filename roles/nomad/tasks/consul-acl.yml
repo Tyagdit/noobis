@@ -75,7 +75,7 @@
       X-Consul-Token: "{{ consul_acl_nomad_token }}"
   register: token_exists
 
-- name: Create ACL token for nomad_{{ node_id }}
+- name: Create ACL token for nomad-{{ node_id }}
   ansible.builtin.uri:
     method: PUT
     url: "https://{{ consul_first_server_ip }}:8501/v1/acl/token"
@@ -87,7 +87,7 @@
     body_format: json
     body:
       SecretID: "{{ consul_acl_nomad_token }}"
-      Description: "ACL token for nomad_{{ node_id }}"
+      Description: "ACL token for nomad-{{ node_id }}"
       Policies:
         - ID: "{% if policy_exists.status == 200 %}{{ policy_exists.json.ID }}{% else %}{{ consul_nomad_policy.json.ID }}{% endif %}"
   when: token_exists.status == 403 or token_exists.content == "ACL not found"

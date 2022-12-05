@@ -84,7 +84,7 @@
     body_format: json
     body:
       SecretID: "{{ consul_acl_prometheus_metrics_token }}"
-      Description: "ACL token for consul_{{ node_id }}"
+      Description: "ACL token for consul-{{ node_id }}"
       Policies:
         - ID: "{% if policy_exists.status == 200 %}{{ policy_exists.json.ID }}{% else %}{{ consul_metrics_policy.json.ID }}{% endif %}"
   when: token_exists.status == 403 or token_exists.content == "ACL not found"

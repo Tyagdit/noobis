@@ -13,7 +13,7 @@
     common_name: "{{ node_type }}.{{ consul_datacenter }}.consul"
     subject_alt_name:
       - "DNS:{{ node_type }}.{{ consul_datacenter }}.consul"
-      - "DNS:consul_{{ node_id }}.{{ node_type }}.{{ consul_datacenter }}.consul"
+      - "DNS:consul-{{ node_id }}.{{ node_type }}.{{ consul_datacenter }}.consul"
       - "DNS:localhost"
       - "IP:127.0.0.1"
       - "IP:{{ hostvars[inventory_hostname]['ansible_host'] | default(inventory_hostname) }}"
