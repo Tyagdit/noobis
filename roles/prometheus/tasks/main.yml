@@ -1,4 +1,7 @@
 ---
+- name: Set up consul acl for prometheus
+  include: consul-acl.yml
+
 - name: create prometheus system group
   ansible.builtin.group:
     name: prometheus
