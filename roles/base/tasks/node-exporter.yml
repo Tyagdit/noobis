@@ -1,11 +1,11 @@
 ---
-- name: create nodeexp system group
+- name: Create nodeexp system group
   ansible.builtin.group:
     name: nodeexp
     state: present
     system: true
 
-- name: create nodeexp system user
+- name: Create nodeexp system user
   ansible.builtin.user:
     name: nodeexp
     group: nodeexp
@@ -13,7 +13,7 @@
     system: true
     create_home: false
 
-- name: get node-exporter archive
+- name: Get node-exporter archive
   ansible.builtin.unarchive:
     dest: "/tmp/"
     src: "{{ node_exporter_url }}"
@@ -36,6 +36,6 @@
 - name: Start node-exporter and ensure it starts on boot
   ansible.builtin.service:
     name: node-exporter.service
-    enabled: yes
+    enabled: true
     state: started
   ignore_errors: "{{ ansible_check_mode }}"

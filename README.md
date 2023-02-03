@@ -1,4 +1,4 @@
-# Noobis [WIP]
+# Noobis
 
 This is a from-scratch Ansible+Terraform deployment script for a private cloud infrastructure on the Hetzner Cloud to be used as a automation/DevOps playground.
 

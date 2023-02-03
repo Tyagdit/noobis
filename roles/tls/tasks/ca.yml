@@ -9,10 +9,10 @@
     privatekey_path: "{{ local_temp_certs_dir }}/{{ item }}_ca_key.pem"
     # required for the 'issuer' section of the CA cert
     country_name: IN
-    basic_constraints_critical: yes
+    basic_constraints_critical: true
     basic_constraints:
       - CA:TRUE
-    key_usage_critical: yes
+    key_usage_critical: true
     # https://github.com/ansible-collections/community.crypto/blob/a050250153596de36e83891b63f2f171c86b2b2a/plugins/module_utils/crypto/cryptography_support.py#L532
     key_usage:
       - digitalSignature

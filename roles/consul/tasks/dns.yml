@@ -26,12 +26,15 @@
     systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
   ignore_errors: "{{ ansible_check_mode }}"
 
-- block:
-    - name: install iptables
+- name: Set up iptables for older systemd versions
+  when: systemd_version|int < 246
+  ignore_errors: "{{ ansible_check_mode }}"
+  block:
+    - name: Install iptables
       ansible.builtin.apt:
         name: iptables
 
-    - name: set iptables rule for DNS forwarding ({{ item }})
+    - name: Set iptables rule for DNS forwarding ({{ item }})
       ansible.builtin.iptables:
         action: append
         table: nat
@@ -45,15 +48,13 @@
       loop:
         - "tcp"
         - "udp"
-  when: systemd_version|int < 246
-  ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Copy consul DNS forwarding config for systemd-resolved 
+- name: Copy consul DNS forwarding config for systemd-resolved
   ansible.builtin.copy:
     dest: /etc/systemd/resolved.conf.d/consul-dns.conf
     content: |
       [Resolve]
-      DNS=127.0.0.1{% if systemd_version|int >= 246 %}:8600{% endif %}
+      DNS=127.0.0.1{% if systemd_version | int >= 246 %}:8600{% endif %}
       DNSSEC=false
       Domains=~consul
   ignore_errors: "{{ ansible_check_mode }}"

@@ -5,7 +5,7 @@
       - ca-certificates
       - lsb-release
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Add Docker GPG apt Key
   ansible.builtin.apt_key:
@@ -19,8 +19,8 @@
 
 - name: Install Docker
   ansible.builtin.apt:
-    update_cache: yes
-    name: 
+    update_cache: true
+    name:
       - docker-ce
       - docker-ce-cli
       - docker-compose-plugin
@@ -37,13 +37,13 @@
   ansible.builtin.user:
     name: "{{ username }}"
     groups: docker
-    append: yes
+    append: true
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Ensure Docker daemons starts on boot
   ansible.builtin.service:
     name: "{{ item }}"
-    enabled: yes
+    enabled: true
     state: started
   loop:
     - docker.service

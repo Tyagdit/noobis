@@ -4,10 +4,10 @@
     name: "{{ username }}"
     state: present
     groups: sudo
-    append: yes
+    append: true
     create_home: true
     shell: "/bin/bash"
-    password: "{{ password | password_hash('sha512', 65534|random(seed=inventory_hostname)|string) }}"
+    password: "{{ password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
 
 - name: Add user to passwordless sudoers
   ansible.builtin.lineinfile:
@@ -22,15 +22,15 @@
   ansible.builtin.apt:
     name: "*"
     state: latest
-    update_cache: yes
+    update_cache: true
   ignore_errors: true
 
 - name: Remove snap
   ansible.builtin.apt:
     name: snapd
     state: absent
-    autoremove: yes
-    purge: yes
+    autoremove: true
+    purge: true
 
 ## Debating whether to do this or copy keys from root user
 # - name: Copy ssh public key
@@ -51,7 +51,7 @@
   ansible.builtin.copy:
     dest: "/home/{{ username }}/.ssh/authorized_keys"
     src: /root/.ssh/authorized_keys
-    remote_src: yes
+    remote_src: true
     owner: "{{ username }}"
     group: "{{ username }}"
   ignore_errors: "{{ ansible_check_mode }}"
@@ -69,9 +69,9 @@
     - regexp: "^PermitRootLogin"
       line: "PermitRootLogin no"
 
-- name: update apt cache
+- name: Update apt cache
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
 
 - name: Install apt packages
   ansible.builtin.apt:
@@ -83,9 +83,10 @@
     state: latest
   ignore_errors: "{{ ansible_check_mode }}"
 
-- include: node-exporter.yml
+- name: Set up Node Exporter
+  include_tasks: node-exporter.yml
 
-- name: restart sshd
+- name: Restart sshd
   ansible.builtin.service:
     name: sshd
     state: restarted

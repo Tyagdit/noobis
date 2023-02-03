@@ -5,27 +5,33 @@
   vars_files:
     - vars/main.yml
   tasks:
-    - assert:
+    - name: Check if password is provided
+      assert:
         that: password != ""
         fail_msg: "No password provided"
 
-    - assert:
+    - name: Check password length
+      assert:
         that: password|length >= 8
         fail_msg: "Password should be at least 8 characters"
 
-    - assert:
+    - name: Check if caddy auth password is provided
+      assert:
         that: caddy_auth_password != ""
         fail_msg: "No auth portal password provided"
 
-    - assert:
+    - name: Check caddy auth password length
+      assert:
         that: caddy_auth_password|length >= 8
         fail_msg: "Auth portal password should be at least 8 characters"
 
-    - assert:
+    - name: Check username length
+      assert:
         that: username|length >= 3
         fail_msg: "Username should be at least 3 characters"
 
-    - assert:
+    - name: Check caddy auth username length
+      assert:
         that: caddy_auth_username|length >= 3
         fail_msg: "Auth portal username should be at least 3 characters"
 
@@ -58,7 +64,7 @@
   vars_files:
     - vars/main.yml
   vars:
-    - node_type: "server"
+    node_type: "server"
   roles:
     - consul
     - nomad
@@ -72,7 +78,7 @@
   vars_files:
     - vars/main.yml
   vars:
-    - node_type: "client"
+    node_type: "client"
   roles:
     - consul
     - docker
@@ -87,7 +93,7 @@
   vars_files:
     - vars/main.yml
   vars:
-    - node_type: "client"
+    node_type: "client"
   roles:
     - consul
     - caddy

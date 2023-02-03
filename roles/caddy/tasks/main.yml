@@ -1,11 +1,11 @@
 ---
-- name: create caddy system group
+- name: Create caddy system group
   ansible.builtin.group:
     name: caddy
     state: present
     system: true
 
-- name: create caddy system user
+- name: Create caddy system user
   ansible.builtin.user:
     name: caddy
     group: caddy
@@ -20,14 +20,14 @@
     owner: caddy
     group: caddy
 
-- name: copy consul tls certs
+- name: Copy consul tls certs
   ansible.builtin.copy:
     src: "{{ consul_certs_dir }}/{{ item.src }}"
     dest: "{{ lb_node_certs_dir }}/{{ item.dest }}"
     mode: "{{ item.mode }}"
     owner: caddy
     group: caddy
-    remote_src: yes
+    remote_src: true
   loop:
     - src: consul_client_tls_key.pem
       dest: lb_node_consul_client_key.pem
@@ -48,8 +48,11 @@
     group: caddy
   ignore_errors: "{{ ansible_check_mode }}"
 
-- include: nomad-tls.yml
+- name: Create TLS certs for use with nomad
+  include_tasks: nomad-tls.yml
 
-- include: consul-template.yml
+- name: Set up consul-template
+  include_tasks: consul-template.yml
 
-- include: caddy.yml
+- name: Set up Caddy
+  include_tasks: caddy.yml

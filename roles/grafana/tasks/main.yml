@@ -1,11 +1,11 @@
 ---
-- name: create grafana system group
+- name: Create grafana system group
   ansible.builtin.group:
     name: grafana
     state: present
     system: true
 
-- name: create grafana system user
+- name: Create grafana system user
   ansible.builtin.user:
     name: grafana
     group: grafana
@@ -22,11 +22,11 @@
       - adduser
       - libfontconfig1
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Install grafana
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
     deb: "https://dl.grafana.com/oss/release/grafana_{{ grafana_version }}_amd64.deb"
   ignore_errors: "{{ ansible_check_mode }}"
 
@@ -148,6 +148,6 @@
 - name: Start grafana and ensure it starts on boot
   ansible.builtin.service:
     name: grafana-server.service
-    enabled: yes
+    enabled: true
     state: started
   ignore_errors: "{{ ansible_check_mode }}"

@@ -4,7 +4,8 @@
     path: "{{ local_temp_certs_dir }}"
     state: directory
 
-- include: ca.yml
+- name: Set up CA certs
+  include_tasks: ca.yml
   loop:
     - "consul"
     - "nomad"

@@ -17,10 +17,10 @@
       - "DNS:localhost"
       - "IP:127.0.0.1"
       - "IP:{{ hostvars[inventory_hostname]['ansible_host'] | default(inventory_hostname) }}"
-    basic_constraints_critical: yes
+    basic_constraints_critical: true
     basic_constraints:
       - CA:FALSE
-    key_usage_critical: yes
+    key_usage_critical: true
     # https://github.com/ansible-collections/community.crypto/blob/a050250153596de36e83891b63f2f171c86b2b2a/plugins/module_utils/crypto/cryptography_support.py#L532
     key_usage:
       - digitalSignature

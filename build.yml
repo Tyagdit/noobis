@@ -5,19 +5,23 @@
   vars_files:
     - vars/main.yml
   tasks:
-    - assert:
+    - name: Check if Hetzner API token is provided
+      assert:  # noqa fqcn[action-core]
         that: terraform_var_hcloud_token != ""
         fail_msg: "No Hetzner Cloud API token provided"
 
-    - assert:
+    - name: Check if Hetzner SSH key name is provided
+      assert:  # noqa fqcn[action-core]
         that: terraform_var_ssh_key_name != ""
         fail_msg: "No Hetzner Cloud SSH key name provided"
 
-    - assert:
+    - name: Check if Cloudflare API token is provided
+      assert:  # noqa fqcn[action-core]
         that: terraform_var_cf_api_token != ""
         fail_msg: "No Cloudflare API token provided"
 
-    - assert:
+    - name: Check if domain name is provided
+      assert:  # noqa fqcn[action-core]
         that: terraform_var_cf_zone_name != ""
         fail_msg: "No domain name provided"
 
@@ -40,8 +44,8 @@
     # Terraform apply
     - name: Deploy infrastructure with terraform
       community.general.terraform:
-        overwrite_init: no
-        force_init: yes
+        overwrite_init: false
+        force_init: true
         project_path: "{{ terraform_project_dir }}"
         state: present
 
@@ -52,4 +56,5 @@
       ansible.builtin.pause:
         seconds: 15
 
-- import_playbook: provision.yml
+- name: Provision all the instances
+  import_playbook: provision.yml

@@ -34,8 +34,8 @@ terraform_var_cf_api_token: "{{ lookup('ansible.builtin.env', 'CLOUDFLARE_API_TO
 terraform_var_cf_zone_name: "{{ lookup('ansible.builtin.env', 'NOOBIS_DOMAIN', default='') }}"
 terraform_var_bastion_username: "bastion_user"
 terraform_var_ssh_key_name: "{{ lookup('ansible.builtin.env', 'NOOBIS_HCLOUD_SSH_NAME', default='') }}"
-terraform_var_network_ip_range: "10.0.0.0/24" 
-terraform_var_subnet_ip_range: "10.0.0.0/28" 
+terraform_var_network_ip_range: "10.0.0.0/24"
+terraform_var_subnet_ip_range: "10.0.0.0/28"
 terraform_var_loadbalancer_count: 1
 terraform_var_server_node_count: 1
 terraform_var_client_node_count: 1

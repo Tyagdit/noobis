@@ -1,15 +1,15 @@
 variable "hcloud_token" {
-  type = string
+  type        = string
   description = "The Hetzner Cloud API token"
 }
 
 variable "cloudflare_api_token" {
-  type = string
+  type        = string
   description = "The Cloudflare API Token to use to edit the Zone's DNS entries"
 }
 
 variable "cloudflare_zone_name" {
-  type = string
+  type        = string
   description = "The Cloudflare Zone name to add DNS entries for"
 }
 

@@ -1,11 +1,11 @@
 ---
-- name: create consul system group
+- name: Create consul system group
   ansible.builtin.group:
     name: consul
     state: present
     system: true
 
-- name: create consul system user
+- name: Create consul system user
   ansible.builtin.user:
     name: consul
     group: consul
@@ -54,15 +54,16 @@
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Create {{ node_type }} TLS key and cert
-  include: tls.yml
+  include_tasks: tls.yml
 
-- block:
+- name: Set up client ACL and DNS
+  when: node_type == "client"
+  block:
     - name: Create client ACL token
-      include: acl.yml
+      include_tasks: acl.yml
       when: not ansible_check_mode
     - name: Setup DNS forwarding on client
-      include: dns.yml
-  when: node_type == "client"
+      include_tasks: dns.yml
 
 - name: Copy consul systemd service
   ansible.builtin.template:
@@ -72,6 +73,6 @@
 - name: Start Consul and ensure it starts on boot
   ansible.builtin.service:
     name: consul.service
-    enabled: yes
+    enabled: true
     state: started
   ignore_errors: "{{ ansible_check_mode }}"

@@ -34,16 +34,17 @@
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Create {{ node_type }} TLS key and cert
-  include: tls.yml
+  include_tasks: tls.yml
 
 - name: Create consul ACL token for nomad {{ node_type }}
-  include: consul-acl.yml
+  include_tasks: consul-acl.yml
   when: not ansible_check_mode
 
-- block:
-    - name: Setup CNI plugins for nomad client
-      include: cni.yml
+- name: Setup CNI plugins for nomad client
   when: node_type == "client"
+  block:
+    - name: Setup CNI plugins for nomad client
+      include_tasks: cni.yml
 
 - name: Copy nomad systemd service
   ansible.builtin.template:
@@ -53,6 +54,6 @@
 - name: Start Nomad and ensure it starts on boot
   ansible.builtin.service:
     name: nomad.service
-    enabled: yes
+    enabled: true
     state: started
   ignore_errors: "{{ ansible_check_mode }}"

@@ -2,7 +2,7 @@
 - name: Install Caddy
   ansible.builtin.get_url:
     url: "{{ caddy_binary_url }}"
-    dest: "/usr/bin/caddy" 
+    dest: "/usr/bin/caddy"
     mode: 0755
   ignore_errors: "{{ ansible_check_mode }}"
 
@@ -21,7 +21,7 @@
 - name: Ensure Caddy starts on boot
   ansible.builtin.service:
     name: caddy.service
-    enabled: yes
+    enabled: true
     state: started
     # this task fails with "permission denied" due to
     # some issue with systemd, this should fix that

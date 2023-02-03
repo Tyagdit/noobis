@@ -13,7 +13,7 @@
     validate_certs: false
     client_key: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
     client_cert: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
-    return_content: yes
+    return_content: true
   register: consul_leader
   until: (consul_leader.json is defined) and (consul_leader.json != '')
   retries: 20
@@ -27,7 +27,7 @@
     validate_certs: false
     client_key: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
     client_cert: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
-    return_content: yes
+    return_content: true
     headers:
       X-Consul-Token: "{{ consul_acl_bootstrap_token }}"
   register: policy_exists
@@ -39,7 +39,7 @@
     validate_certs: false
     client_key: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
     client_cert: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
-    return_content: yes
+    return_content: true
     headers:
       X-Consul-Token: "{{ consul_acl_bootstrap_token }}"
     body_format: json
@@ -64,7 +64,7 @@
     validate_certs: false
     client_key: "{{ consul_certs_dir }}/consul_client_tls_key.pem"
     client_cert: "{{ consul_certs_dir }}/consul_client_tls_cert.pem"
-    return_content: yes
+    return_content: true
     headers:
       X-Consul-Token: "{{ consul_acl_client_token }}"
   register: token_exists

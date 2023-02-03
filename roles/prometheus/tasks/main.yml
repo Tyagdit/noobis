@@ -1,14 +1,14 @@
 ---
 - name: Set up consul acl for prometheus
-  include: consul-acl.yml
+  include_tasks: consul-acl.yml
 
-- name: create prometheus system group
+- name: Create prometheus system group
   ansible.builtin.group:
     name: prometheus
     state: present
     system: true
 
-- name: create prometheus system user
+- name: Create prometheus system user
   ansible.builtin.user:
     name: prometheus
     group: prometheus
@@ -75,6 +75,6 @@
 - name: Start prometheus and ensure it starts on boot
   ansible.builtin.service:
     name: prometheus.service
-    enabled: yes
+    enabled: true
     state: started
   ignore_errors: "{{ ansible_check_mode }}"

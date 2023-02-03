@@ -48,6 +48,6 @@
 - name: Ensure consul-template starts on boot
   ansible.builtin.service:
     name: consul-template.service
-    enabled: yes
+    enabled: true
     state: started
   ignore_errors: "{{ ansible_check_mode }}"
