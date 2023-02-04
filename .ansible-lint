@@ -3,11 +3,12 @@
 profile: moderate
 
 exclude_paths:
-    - assets/
-    - certs/
-    - jobs/
-    - terraform/
+  - .github/
+  - assets/
+  - certs/
+  - jobs/
+  - terraform/
 
 skip_list:
-    - name[template]
-    - yaml[line-length]
+  - name[template]
+  - yaml[line-length]
