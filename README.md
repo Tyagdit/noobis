@@ -57,7 +57,7 @@ https://service2.example.com
 ```
 The internal links have SSO so the first time you visit any of them you will be redirected for authentication using the configured credentials. You can go to `auth.example.com` to  change the password, access user info and links to internal services
 
-You can SSH into the nodes with 
+You can SSH into the nodes with
 ```bash
 ssh -J bastion_user@<lb_ip> <noobis_user>@10.0.0.<x>
 ```
@@ -67,7 +67,7 @@ ssh -J bastion_user@<lb_ip> <noobis_user>@10.0.0.<x>
 ### Environment Variables
 
 - Required
-    - `HCLOUD_TOKEN` - Hetzner Cloud API token 
+    - `HCLOUD_TOKEN` - Hetzner Cloud API token
     - `CLOUDFLARE_API_TOKEN` - Cloudflare API Token with permissions to edit the DNS entries for the zone of the domain to use
     - `NOOBIS_HCLOUD_SSH_KEY` - Name of the SSH key set up on Hetzner Cloud that will be used to provision the instances
     - `NOOBIS_DOMAIN` - The domain that caddy wil serve (i.e Cloudflare Zone name)
@@ -110,7 +110,7 @@ Edit the [vars/main.yml](/vars/main.yml) file for further configuration
 
 - Caddy for reverse proxying to all the services and nomad, consul, prometheus & grafana
 - Prometheus to collect consul and nomad cluster health metrics and metrics from consul service mesh's envoy sidecar proxies
-- Grafana to visualize metrics from Prometheus 
+- Grafana to visualize metrics from Prometheus
 
 #### Server Nodes
 

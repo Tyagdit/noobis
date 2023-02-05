@@ -15,10 +15,10 @@
 
         authentication portal auth_portal {
             enable identity store local_id_db
-            
+
             cookie domain [[ caddy_host_domain ]]
             cookie lifetime 86400 # 24 Hours
-            
+
             ui {
                 meta title "Noobis Admin Portal"
                 meta author "tyagdit github.com/tyagdit/noobis"
@@ -33,7 +33,7 @@
                     "User Info" /whoami icon "las la-info-circle"
                 }
             }
-            
+
             # transform user {
             #     match realm local
             #     action add role authp/admin
@@ -47,7 +47,7 @@
             validate bearer header
 
             enable login hint
-            
+
             allow roles authp/admin
 
             # acl rule {
